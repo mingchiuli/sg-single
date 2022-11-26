@@ -1,7 +1,14 @@
 # DataSource Config
 spring:
   jpa:
-    open-in-view: false
+    database: MYSQL
+    show-sql: true
+    open-in-view: true
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true #使用延时加载时控制Session的生命周期
+        dialect: org.hibernate.dialect.MySQLDialect
+        ddl-auto: update
   rabbitmq:
 #    开启发送端确认
     publisher-confirm-type: correlated
@@ -32,9 +39,6 @@ spring:
 server:
   port: 8081
   max-http-request-header-size: 10MB
-
-mybatis-plus:
-  mapper-locations: classpath*:/mapper/**Mapper.xml
 
 #配置自定义的线程池
 blog:

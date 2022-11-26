@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
 
 
@@ -21,15 +20,11 @@ public class SpringUtils implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
-
         SpringUtils.applicationContext = applicationContext;
-
     }
 
     public static <T> T getBean(Class<T> clazz){
-
         return applicationContext.getBean(clazz);
-
     }
 
     public static <T> Map<String, T> getHandlers(Class<T> clazz) {

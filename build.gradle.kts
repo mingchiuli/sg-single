@@ -54,6 +54,8 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-amqp")
         implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
         implementation("org.springframework.boot:spring-boot-starter-websocket")
+        implementation("org.redisson:redisson-spring-boot-starter:3.18.0")
+        runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.85.Final:osx-aarch_64")
         runtimeOnly("org.springframework.boot:spring-boot-devtools")
         runtimeOnly("mysql:mysql-connector-java:8.0.30")
     }

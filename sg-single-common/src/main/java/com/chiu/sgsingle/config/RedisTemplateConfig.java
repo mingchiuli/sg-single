@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @create 2021-11-20 10:03 PM
  */
 @Configuration(proxyBeanMethods = false)
-public class RedisConfig {
+public class RedisTemplateConfig {
 
     /**
      * 去掉key前面的乱码
