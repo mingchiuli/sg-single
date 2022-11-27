@@ -4,8 +4,8 @@ package com.chiu.sgsingle.exception;
  * @author mingchiuli
  * @create 2022-07-07 11:06 AM
  */
-public class NoFoundException extends RuntimeException {
-    public NoFoundException(String message) {
+public class NotFoundException extends RuntimeException {
+    public NotFoundException(String message) {
         super(message);
     }
 }

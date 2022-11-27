@@ -2,7 +2,7 @@ package com.chiu.sgsingle.bloom.handler.impl;
 
 
 import com.chiu.sgsingle.bloom.handler.BloomHandler;
-import com.chiu.sgsingle.exception.NoFoundException;
+import com.chiu.sgsingle.exception.NotFoundException;
 import com.chiu.sgsingle.lang.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,7 +27,7 @@ public class ListByYearHandler implements BloomHandler {
         Integer currentPage = (Integer) args[0];
         Integer yearMark = (Integer) args[1];
         if (Boolean.FALSE.equals(redisTemplate.opsForValue().getBit(Const.BLOOM_FILTER_PAGE + yearMark, currentPage))) {
-            throw new NoFoundException("没有" + yearMark + "年份" + currentPage + "页面！");
+            throw new NotFoundException("没有" + yearMark + "年份" + currentPage + "页面！");
         }
     }
 }
