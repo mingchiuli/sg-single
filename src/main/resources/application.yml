@@ -46,8 +46,9 @@ blog:
     core-size: 20
     max-size: 100
     keep-alive-time: 10
-  addResourceHandler: /upload/**
-  imgFoldName: img
+  add-resource-handler: /upload/**
+  img-fold-name: img
+  highest-role: admin
 
 #logging:
 #  level:

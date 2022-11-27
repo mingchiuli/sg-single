@@ -22,8 +22,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":sg-single-common"))
     implementation(project(":sg-single-blog"))
+    implementation(project(":sg-single-blog-admin"))
     implementation(project(":sg-single-search"))
     implementation(project(":sg-single-websocket"))
+    implementation(project(":sg-single-authentication"))
+    implementation(project(":sg-single-captcha"))
 }
 
 tasks.withType<Test> {
@@ -54,7 +57,7 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-amqp")
         implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
         implementation("org.springframework.boot:spring-boot-starter-websocket")
-        implementation("org.redisson:redisson-spring-boot-starter:3.18.0")
+//        implementation("org.redisson:redisson-spring-boot-starter:3.18.1")
         runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.85.Final:osx-aarch_64")
         runtimeOnly("org.springframework.boot:spring-boot-devtools")
         runtimeOnly("mysql:mysql-connector-java:8.0.30")

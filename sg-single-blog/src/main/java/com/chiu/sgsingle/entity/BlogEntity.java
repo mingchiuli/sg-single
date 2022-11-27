@@ -1,15 +1,8 @@
 package com.chiu.sgsingle.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.Hibernate;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -38,21 +31,15 @@ public class BlogEntity implements Serializable {
     @Column(name = "user_id")
     private Long userId;
 
-    @NotBlank(message = "标题不能为空")
     @Column(name = "title")
     private String title;
 
-    @NotBlank(message = "摘要不能为空")
     @Column(name = "description")
     private String description;
 
-    @NotBlank(message = "内容不能为空")
     @Column(name = "content")
     private String content;
 
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created")
     private LocalDateTime created;
 

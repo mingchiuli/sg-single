@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
 
 /**
@@ -30,13 +29,14 @@ public class JwtUtils {
     /**
      * 生成jwt token
      */
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + expire * 1000);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
+                .claim("authorization", role)
                 .setSubject(username)
                 .setIssuedAt(nowDate)
                 .setExpiration(expireDate)

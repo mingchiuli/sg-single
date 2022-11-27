@@ -48,7 +48,7 @@ public class BloomAspect {
         Class<?> declaringType = signature.getDeclaringType();
         Method method = declaringType.getMethod(methodName, classes);
         Bloom bloom = method.getAnnotation(Bloom.class);
-        Class<?> aClass = bloom.name();
+        Class<?> aClass = bloom.handler();
 
         for (BloomHandler handler : CacheHandlers.cacheHandlers.values()) {
             if (handler.supports(aClass)) {

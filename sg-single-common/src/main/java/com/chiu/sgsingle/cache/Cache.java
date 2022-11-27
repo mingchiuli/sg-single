@@ -13,6 +13,6 @@ public @interface Cache {
 
     long expire() default 120;
 
-    String name() default "";
+    String prefix() default "";
 
 }

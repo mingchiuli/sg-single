@@ -9,8 +9,6 @@ import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.annotation.Order;
@@ -35,13 +33,6 @@ import java.util.concurrent.TimeUnit;
 public class CacheAspect {
 
     private static final String LOCK = "lock:";
-
-    RedissonClient redissonClient;
-
-    @Autowired
-    public void setRedissonClient(RedissonClient redissonClient) {
-        this.redissonClient = redissonClient;
-    }
 
     RedisTemplate<String, Object> redisTemplate;
 
@@ -94,7 +85,7 @@ public class CacheAspect {
 
         Cache annotation = method.getAnnotation(Cache.class);
         long expire = annotation.expire();
-        String name = annotation.name();
+        String prefix = annotation.prefix();
 
         Type genericReturnType = method.getGenericReturnType();
 
@@ -114,7 +105,7 @@ public class CacheAspect {
             javaType = objectMapper.getTypeFactory().constructType(genericReturnType);
         }
 
-        String redisKey = StringUtils.hasLength(name) ? name + "::" + className + "::" + methodName + params : className + "::" + methodName + params;
+        String redisKey = StringUtils.hasLength(prefix) ? prefix + "::" + className + "::" + methodName + params : className + "::" + methodName + params;
 
         Object o;
 
@@ -129,12 +120,10 @@ public class CacheAspect {
             return objectMapper.convertValue(o, javaType);
         }
 
-        String lockFlag = LOCK + className + methodName + params;
-        RLock rLock = redissonClient.getLock(lockFlag);
+        String lock = (LOCK + className + methodName + params).intern();
 
         //防止缓存击穿
-        try {
-            rLock.lock();
+        synchronized (lock) {
             //双重检查
             Object r = redisTemplate.opsForValue().get(redisKey);
 
@@ -145,10 +134,6 @@ public class CacheAspect {
             Object proceed = pjp.proceed();
             redisTemplate.opsForValue().set(redisKey, proceed, expire, TimeUnit.SECONDS);
             return proceed;
-        } finally {
-            if (rLock.isLocked()) {
-                rLock.unlock();
-            }
         }
     }
 }
