@@ -63,8 +63,4 @@ subprojects {
         runtimeOnly("mysql:mysql-connector-java:8.0.30")
     }
 
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
-
 }
