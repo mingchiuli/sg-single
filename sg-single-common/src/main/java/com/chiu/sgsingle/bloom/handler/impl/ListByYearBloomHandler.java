@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ListByYearHandler implements BloomHandler {
+public class ListByYearBloomHandler implements BloomHandler {
     RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
@@ -19,7 +19,7 @@ public class ListByYearHandler implements BloomHandler {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.equals(ListByYearHandler.class);
+        return clazz.equals(ListByYearBloomHandler.class);
     }
 
     @Override

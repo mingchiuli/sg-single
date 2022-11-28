@@ -92,15 +92,7 @@ public class CacheAspect {
         JavaType javaType;
 
         if (genericReturnType instanceof ParameterizedType parameterizedType) {
-            Class<?> rawType = (Class<?>) parameterizedType.getRawType();
-            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-
-            Class<?>[] classes = new Class<?>[actualTypeArguments.length];
-            for (int i = 0; i < classes.length; i++) {
-                classes[i] = (Class<?>) actualTypeArguments[i];
-            }
-
-            javaType = objectMapper.getTypeFactory().constructParametricType(rawType, classes);
+            javaType = getTypesReference(parameterizedType);
         } else {
             javaType = objectMapper.getTypeFactory().constructType(genericReturnType);
         }
@@ -135,5 +127,20 @@ public class CacheAspect {
             redisTemplate.opsForValue().set(redisKey, proceed, expire, TimeUnit.SECONDS);
             return proceed;
         }
+    }
+
+    private JavaType getTypesReference(ParameterizedType parameterizedType) {
+        Class<?> rawType = (Class<?>) parameterizedType.getRawType();
+        Type[] arguments = parameterizedType.getActualTypeArguments();
+        JavaType[] javaTypes = new JavaType[arguments.length];
+        for (int i = 0; i < javaTypes.length; i++) {
+            if (arguments[i] instanceof ParameterizedType _parameterizedType) {
+                JavaType type = getTypesReference(_parameterizedType);
+                javaTypes[i] = type;
+            } else {
+                javaTypes[i] = objectMapper.getTypeFactory().constructType(arguments[i]);
+            }
+        }
+        return objectMapper.getTypeFactory().constructParametricType(rawType, javaTypes);
     }
 }

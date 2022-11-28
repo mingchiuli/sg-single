@@ -64,4 +64,12 @@ public class BlogEntity implements Serializable {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+    public BlogEntity(Long id, String title, String description, LocalDateTime created, String link) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.created = created;
+        this.link = link;
+    }
 }

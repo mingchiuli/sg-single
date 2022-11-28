@@ -1,6 +1,7 @@
 package com.chiu.sgsingle.service;
 
 import com.chiu.sgsingle.entity.BlogEntity;
+import com.chiu.sgsingle.page.PageAdapter;
 
 /**
  * @author mingchiuli
@@ -12,4 +13,5 @@ public interface BlogService {
 
     BlogEntity findById(Long id);
 
+    PageAdapter<BlogEntity> listPage(Integer currentPage);
 }
