@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
     UserEntity findByUsername(String username);
 
-    @Query("UPDATE UserEntity user set user.lastLogin = ?2 where user.username = ?1")
+    @Query(value = "UPDATE UserEntity user set user.lastLogin = ?2 where user.username = ?1")
     @Modifying
     void updateLoginTime(String username, LocalDateTime time);
 
-    @Query("SELECT new UserEntity (id, username, avatar, email, role) from UserEntity where username = ?1")
+    @Query(value = "SELECT new UserEntity (id, username, avatar, email, role) from UserEntity where username = ?1")
     UserEntity retrieveUserInfo(String orElseThrow);
 
 }

@@ -12,15 +12,15 @@ import java.util.concurrent.TimeUnit;
  * @author mingchiuli
  * @create 2022-04-26 10:06 PM
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(ThreadPoolConfigProperties.class)
 public class ThreadPoolConfig {
     @Bean("scheduledThreadPoolExecutor")
     public ThreadPoolExecutor scheduledThreadPoolExecutor(ThreadPoolConfigProperties pool) {
-        return new ThreadPoolExecutor(pool.getCoreSize(),
-                pool.getMaxSize(),
+        return new ThreadPoolExecutor(5,
+                20,
                 pool.getKeepAliveTime(), TimeUnit.SECONDS,
-                new LinkedBlockingDeque<>(1000),
+                new LinkedBlockingDeque<>(30),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());
     }

@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PublicDetailHandler implements BloomHandler {
+public class BlogStatusBloomHandler implements BloomHandler {
 
     RedisTemplate<String, Object> redisTemplate;
 
@@ -20,7 +20,7 @@ public class PublicDetailHandler implements BloomHandler {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.equals(PublicDetailHandler.class);
+        return clazz.equals(BlogStatusBloomHandler.class);
     }
 
     @Override

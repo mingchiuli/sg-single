@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GetCountByYearHandler implements BloomHandler {
+public class CountByYearBloomHandler implements BloomHandler {
 
     RedisTemplate<String, Object> redisTemplate;
 
@@ -20,7 +20,7 @@ public class GetCountByYearHandler implements BloomHandler {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return clazz.equals(GetCountByYearHandler.class);
+        return clazz.equals(CountByYearBloomHandler.class);
     }
 
     @Override

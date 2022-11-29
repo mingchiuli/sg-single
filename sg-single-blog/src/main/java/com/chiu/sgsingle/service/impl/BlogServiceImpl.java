@@ -1,5 +1,6 @@
 package com.chiu.sgsingle.service.impl;
 
+import com.chiu.sgsingle.cache.Cache;
 import com.chiu.sgsingle.entity.BlogEntity;
 import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.page.PageAdapter;
@@ -19,6 +20,9 @@ import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,6 +47,7 @@ public class BlogServiceImpl implements BlogService {
         this.blogRepository = blogRepository;
     }
 
+    @Cache(prefix = Const.HOT_BLOG)
     public BlogEntity findByIdAndStatus(Long id, Integer status) {
         return blogRepository.findByIdAndStatus(id, status);
     }
@@ -78,6 +83,63 @@ public class BlogServiceImpl implements BlogService {
         Pageable pageRequest = PageRequest.of(currentPage - 1, Const.PAGE_SIZE, Sort.by("created").descending());
         Page<BlogEntity> page = blogRepository.findAll(pageRequest);
         return new PageAdapter<>(page);
+    }
+
+    @Override
+    public PageAdapter<BlogEntity> listPageByYear(Integer currentPage, Integer year) {
+        LocalDateTime start = LocalDateTime.of(year, 1, 1 , 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(year, 12, 31 , 23, 59, 59);
+        Pageable pageRequest = PageRequest.of(currentPage - 1, Const.PAGE_SIZE, Sort.by("created").descending());
+        Page<BlogEntity> page = blogRepository.findAllByYear(pageRequest, start, end);
+        return new PageAdapter<>(page);
+    }
+
+    @Override
+    public Integer getCountByYear(Integer year) {
+        LocalDateTime start = LocalDateTime.of(year, 1, 1 , 0, 0, 0);
+        LocalDateTime end = LocalDateTime.of(year, 12, 31 , 23, 59, 59);
+        return blogRepository.countByYear(start, end);
+    }
+
+    @Override
+    public BlogEntity getLockedBlog(Long blogId, String token) {
+        token = token.trim();
+        String password = (String) redisTemplate.opsForValue().get(Const.READ_TOKEN);
+        if (StringUtils.hasLength(token) && StringUtils.hasLength(password)) {
+            if (token.equals(password)) {
+                return blogRepository.findByIdAndStatus(blogId, 1);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public Integer getBlogStatus(Long blogId) {
+        return blogRepository.getBlogStatus(blogId);
+    }
+
+    @Override
+    public List<Integer> searchYears() {
+        return blogRepository.searchYears();
+    }
+
+    @Override
+    public List<BlogEntity> findByStatus(int status) {
+        return blogRepository.findAllByStatus(status);
+    }
+
+    @Override
+    public List<BlogEntity> findAll() {
+        ArrayList<BlogEntity> entities = new ArrayList<>();
+        for (BlogEntity blogEntity : blogRepository.findAll()) {
+            entities.add(blogEntity);
+        }
+        return entities;
+    }
+
+    @Override
+    public Integer count() {
+        return blogRepository.findCount();
     }
 
 }

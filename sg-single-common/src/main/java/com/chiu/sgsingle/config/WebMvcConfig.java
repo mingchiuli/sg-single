@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author mingchiuli
  * @create 2021-11-06 6:24 PM
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * 文件上传处理，URL映射到本地磁盘路径

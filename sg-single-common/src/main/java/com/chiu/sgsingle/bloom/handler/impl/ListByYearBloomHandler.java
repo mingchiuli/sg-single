@@ -26,7 +26,7 @@ public class ListByYearBloomHandler implements BloomHandler {
     public void handle(Object[] args) {
         Integer currentPage = (Integer) args[0];
         Integer yearMark = (Integer) args[1];
-        if (Boolean.FALSE.equals(redisTemplate.opsForValue().getBit(Const.BLOOM_FILTER_PAGE + yearMark, currentPage))) {
+        if (Boolean.FALSE.equals(redisTemplate.opsForValue().getBit(Const.BLOOM_FILTER_YEAR_PAGE + yearMark, currentPage))) {
             throw new NotFoundException("没有" + yearMark + "年份" + currentPage + "页面！");
         }
     }
