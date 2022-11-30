@@ -70,8 +70,8 @@ public class BlogSearchServiceImpl implements BlogSearchService {
                                         range(rangeQuery -> rangeQuery.
                                                 field("created").
                                                 from(year == null ? null : year + "-01-01T00:00:00.000").
-                                                to(year == null ? null : year + "-12-31T23:59:59.999").
-                                                timeZone("+08:00")))))
+                                                to(year == null ? null : year + "-12-31T23:59:59.999")
+                                        ))))
                 .withSort(sort -> sort.
                         score(score -> score.
                                 order(SortOrder.Desc)))
