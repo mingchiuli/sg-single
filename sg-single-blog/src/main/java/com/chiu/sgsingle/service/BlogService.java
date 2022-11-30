@@ -27,8 +27,6 @@ public interface BlogService {
 
     List<Integer> searchYears();
 
-    List<BlogEntity> findByStatus(int status);
-
     List<BlogEntity> findAll();
 
     Integer count();

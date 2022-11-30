@@ -123,10 +123,6 @@ public class BlogServiceImpl implements BlogService {
         return blogRepository.searchYears();
     }
 
-    @Override
-    public List<BlogEntity> findByStatus(int status) {
-        return blogRepository.findAllByStatus(status);
-    }
 
     @Override
     public List<BlogEntity> findAll() {
