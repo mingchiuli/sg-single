@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 public class Result<T> implements Serializable {
 
-    private int code;
+    private int status;
     private String msg;
     private T data;
 
@@ -19,15 +19,15 @@ public class Result<T> implements Serializable {
         return load(200, "操作成功",data); //200为正常，非200为非正常
     }
 
-    private static <T> Result<T> load(int code, String msg, T data) {
+    private static <T> Result<T> load(int status, String msg, T data) {
         Result<T> r = new Result<>();
-        r.setCode(code);
+        r.setStatus(status);
         r.setData(data);
         r.setMsg(msg);
         return r;
     }
-    public static <T> Result<T> fail(Integer code, String msg, T data) {
-        return load(code, msg, data);
+    public static <T> Result<T> fail(Integer status, String msg, T data) {
+        return load(status, msg, data);
     }
 
     public static <T> Result<T> fail(String msg) {
