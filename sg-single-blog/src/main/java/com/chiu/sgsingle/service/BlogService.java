@@ -2,7 +2,7 @@ package com.chiu.sgsingle.service;
 
 import com.chiu.sgsingle.entity.BlogEntity;
 import com.chiu.sgsingle.page.PageAdapter;
-
+import com.chiu.sgsingle.vo.BlogEntityVo;
 import java.util.List;
 
 /**
@@ -30,4 +30,6 @@ public interface BlogService {
     List<BlogEntity> findAll();
 
     Integer count();
+
+    void saveOrUpdate(BlogEntityVo blog);
 }

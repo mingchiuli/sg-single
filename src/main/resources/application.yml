@@ -50,6 +50,7 @@ blog:
   add-resource-handler: /upload/**
   img-fold-name: img
   highest-role: admin
+  default-role: boy,girl
   blog-page-size: 5
   web-page-size: 9
 

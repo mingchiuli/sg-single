@@ -39,7 +39,8 @@ public class BlogSearchServiceImpl implements BlogSearchService {
     public PageAdapter<BlogDocumentVo> selectBlogsByES(Integer currentPage, String keyword, Integer flag, Integer year) {
 
         HighlightParameters highlightParameters;
-        HighlightParameters.HighlightParametersBuilder highlightParametersBuilder = new HighlightParameters.HighlightParametersBuilder().
+        HighlightParameters.HighlightParametersBuilder highlightParametersBuilder = new HighlightParameters.
+                HighlightParametersBuilder().
                 withPreTags("<b style='color:red'>").
                 withPostTags("</b>");
         if (flag == 0) {
@@ -70,8 +71,7 @@ public class BlogSearchServiceImpl implements BlogSearchService {
                                         range(rangeQuery -> rangeQuery.
                                                 field("created").
                                                 from(year == null ? null : year + "-01-01T00:00:00.000").
-                                                to(year == null ? null : year + "-12-31T23:59:59.999")
-                                        ))))
+                                                to(year == null ? null : year + "-12-31T23:59:59.999")))))
                 .withSort(sort -> sort.
                         score(score -> score.
                                 order(SortOrder.Desc)))
@@ -90,7 +90,6 @@ public class BlogSearchServiceImpl implements BlogSearchService {
             vo.setHighlight(hit.getHighlightFields().values().toString());
             vos.add(vo);
         });
-
 
         return PageAdapter.
                 <BlogDocumentVo>builder().

@@ -19,6 +19,10 @@ public class Result<T> implements Serializable {
         return load(200, "操作成功",data); //200为正常，非200为非正常
     }
 
+    public static <T> Result<T> success() {
+        return load(200, "操作成功",null); //200为正常，非200为非正常
+    }
+
     private static <T> Result<T> load(int status, String msg, T data) {
         Result<T> r = new Result<>();
         r.setStatus(status);

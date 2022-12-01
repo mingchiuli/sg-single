@@ -1,12 +1,22 @@
 package com.chiu.sgsingle.service.impl;
 
+import com.chiu.sgsingle.search.BlogIndexEnum;
 import com.chiu.sgsingle.cache.Cache;
+import com.chiu.sgsingle.config.RabbitConfig;
 import com.chiu.sgsingle.entity.BlogEntity;
+import com.chiu.sgsingle.entity.UserEntity;
 import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.repository.BlogRepository;
+import com.chiu.sgsingle.repository.UserRepository;
+import com.chiu.sgsingle.search.BlogSearchIndexMessage;
 import com.chiu.sgsingle.service.BlogService;
+import com.chiu.sgsingle.vo.BlogEntityVo;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.DataAccessException;
@@ -19,11 +29,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +49,20 @@ public class BlogServiceImpl implements BlogService {
     BlogRepository blogRepository;
 
     RedisTemplate<String, Object> redisTemplate;
+
+    UserRepository userRepository;
+
+    RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    public void setRabbitTemplate(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Autowired
     public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
@@ -126,7 +153,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<BlogEntity> findAll() {
-        ArrayList<BlogEntity> entities = new ArrayList<>();
+        List<BlogEntity> entities = new ArrayList<>();
         for (BlogEntity blogEntity : blogRepository.findAll()) {
             entities.add(blogEntity);
         }
@@ -136,6 +163,38 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Integer count() {
         return blogRepository.findCount();
+    }
+
+    @Override
+    public void saveOrUpdate(BlogEntityVo blog) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity user = userRepository.findByUsername(username);
+        BlogEntity blogEntity;
+        if (blog.getId() == null) {
+            blog.setCreated(LocalDateTime.now());
+            blog.setUserId(user.getId());
+            blogEntity = new BlogEntity();
+        } else {
+            Optional<BlogEntity> optionalBlog = blogRepository.findById(blog.getId());
+            blogEntity = optionalBlog.orElseThrow();
+            Assert.isTrue(blogEntity.getUserId().equals(user.getId()), "只能编辑自己的文章!");
+        }
+        BeanUtils.copyProperties(blog, blogEntity);
+        blogRepository.save(blogEntity);
+
+        //通知消息给mq,更新并删除缓存
+        CorrelationData correlationData = new CorrelationData();
+        //防止重复消费
+        redisTemplate.opsForValue().set(Const.CONSUME_MONITOR + correlationData.getId(),
+                        BlogIndexEnum.UPDATE.name() + "_" + blog.getId(),
+                        30,
+                        TimeUnit.SECONDS);
+
+        rabbitTemplate.convertAndSend(
+                RabbitConfig.ES_EXCHANGE,
+                RabbitConfig.ES_BINDING_KEY,
+                new BlogSearchIndexMessage(blog.getId(), BlogIndexEnum.UPDATE),
+                correlationData);
     }
 
 }
