@@ -3,6 +3,9 @@ package com.chiu.sgsingle.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,11 +15,14 @@ import java.util.Objects;
  * @author mingchiuli
  * @create 2022-11-27 12:56 am
  */
+@Entity
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Entity
+@AllArgsConstructor
+@DynamicUpdate
+@Builder
 @Table(name ="m_blog")
 public class BlogEntity implements Serializable {
 
@@ -25,7 +31,8 @@ public class BlogEntity implements Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
     @Column(name = "user_id")

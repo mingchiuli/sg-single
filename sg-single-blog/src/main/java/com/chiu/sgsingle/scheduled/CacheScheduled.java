@@ -29,19 +29,9 @@ public class CacheScheduled {
     BlogService blogService;
     RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
-    @Qualifier("scheduledThreadPoolExecutor")
-    public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
-        this.executor = threadPoolExecutor;
-    }
-
-    @Autowired
-    public void setBlogService(BlogService blogService) {
+    public CacheScheduled(@Qualifier("scheduledThreadPoolExecutor") ThreadPoolExecutor executor, BlogService blogService, RedisTemplate<String, Object> redisTemplate) {
+        this.executor = executor;
         this.blogService = blogService;
-    }
-
-    @Autowired
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

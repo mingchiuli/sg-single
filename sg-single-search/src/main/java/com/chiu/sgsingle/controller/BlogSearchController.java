@@ -22,8 +22,7 @@ public class BlogSearchController {
 
     BlogSearchService blogSearchService;
 
-    @Autowired
-    public void setBlogSearchService(BlogSearchService blogSearchService) {
+    public BlogSearchController(BlogSearchService blogSearchService) {
         this.blogSearchService = blogSearchService;
     }
 

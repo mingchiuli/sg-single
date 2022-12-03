@@ -19,25 +19,14 @@ import java.io.IOException;
 
 @Component
 public class CaptchaFilter extends OncePerRequestFilter {
-
 	ObjectMapper objectMapper;
-
 	RedisTemplate<String, Object> redisTemplate;
-
 	LoginFailureHandler loginFailureHandler;
 
 	@Autowired
-	public void setObjectMapper(ObjectMapper objectMapper) {
+	public CaptchaFilter(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate, LoginFailureHandler loginFailureHandler) {
 		this.objectMapper = objectMapper;
-	}
-
-	@Autowired
-	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
 		this.redisTemplate = redisTemplate;
-	}
-
-	@Autowired
-	public void setLoginFailureHandler(LoginFailureHandler loginFailureHandler) {
 		this.loginFailureHandler = loginFailureHandler;
 	}
 

@@ -5,6 +5,7 @@ repositories {
 
 dependencies {
     implementation(project(":sg-single-common"))
+    implementation(project(":sg-single-blog"))
 }
 
 tasks.bootJar{

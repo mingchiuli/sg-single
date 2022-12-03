@@ -14,7 +14,7 @@ public class Const {
 
     public final static String READ_RECENT = "blogReadRecent:";
 
-    public final static String HOT_BLOGS_PREFIX = "hot_blogs*";
+    public final static String HOT_BLOGS_PATTERN = "hot_blogs*";
 
     //url相关，不相关上传路径
     public final static String UPLOAD_IMG_PATH = "/upload/img/";

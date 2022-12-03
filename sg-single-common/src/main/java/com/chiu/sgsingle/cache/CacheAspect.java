@@ -35,16 +35,10 @@ public class CacheAspect {
     private static final String LOCK = "lock:";
 
     RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private void setRedisTemplateImpl(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
-
     ObjectMapper objectMapper;
 
-    @Autowired
-    public void setObjectMapper(ObjectMapper objectMapper) {
+    public CacheAspect(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
+        this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
     }
 

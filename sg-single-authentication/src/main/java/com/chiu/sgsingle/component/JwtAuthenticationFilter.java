@@ -24,34 +24,25 @@ import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
-
 	ObjectMapper objectMapper;
-
 	JwtUtils jwtUtils;
-
 	UserRepository userRepository;
-
 	RedisTemplate<String, Object> redisTemplate;
-
-
 	@Autowired
 	public void setObjectMapper(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
-
-	@Autowired
-	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
-
 	@Autowired
 	public void setJwtUtils(JwtUtils jwtUtils) {
 		this.jwtUtils = jwtUtils;
 	}
-
 	@Autowired
-	public void setSysUserService(UserRepository userRepository) {
+	public void setUserRepository(UserRepository userRepository) {
 		this.userRepository = userRepository;
+	}
+	@Autowired
+	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+		this.redisTemplate = redisTemplate;
 	}
 
 	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {

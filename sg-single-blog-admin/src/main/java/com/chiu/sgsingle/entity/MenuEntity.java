@@ -3,6 +3,8 @@ package com.chiu.sgsingle.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,6 +19,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@DynamicUpdate
 @Table(name ="m_menu")
 public class MenuEntity implements Serializable {
 
@@ -25,7 +28,8 @@ public class MenuEntity implements Serializable {
 
     @Id
     @Column(name = "menu_id")
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
     private Long menuId;
 
     @Column(name = "parent_id")

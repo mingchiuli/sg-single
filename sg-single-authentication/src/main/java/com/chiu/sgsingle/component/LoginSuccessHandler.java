@@ -27,23 +27,12 @@ import java.util.Optional;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 	ObjectMapper objectMapper;
-
-	@Autowired
-	public void setObjectMapper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
-	}
-
 	JwtUtils jwtUtils;
-
-	@Autowired
-	public void setJwtUtils(JwtUtils jwtUtils) {
-		this.jwtUtils = jwtUtils;
-	}
-
 	UserRepository userRepository;
 
-	@Autowired
-	public void setUserService(UserRepository userRepository) {
+	public LoginSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils, UserRepository userRepository) {
+		this.objectMapper = objectMapper;
+		this.jwtUtils = jwtUtils;
 		this.userRepository = userRepository;
 	}
 

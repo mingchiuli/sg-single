@@ -20,11 +20,8 @@ import java.nio.charset.StandardCharsets;
  */
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
 	ObjectMapper objectMapper;
-
-	@Autowired
-	public void setObjectMapper(ObjectMapper objectMapper) {
+	public JwtAuthenticationEntryPoint(ObjectMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 
@@ -34,7 +31,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		ServletOutputStream outputStream = response.getOutputStream();
 
-		Result result = Result.fail(authException.getMessage());
+		Result<String> result = Result.fail(authException.getMessage());
 
 		outputStream.write(objectMapper.writeValueAsString(result).getBytes(StandardCharsets.UTF_8));
 

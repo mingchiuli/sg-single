@@ -14,8 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 public class AuthenticationManagerConfig {
     AuthenticationConfiguration authenticationConfiguration;
 
-    @Autowired
-    public void setAuthenticationConfiguration(AuthenticationConfiguration authenticationConfiguration) {
+    public AuthenticationManagerConfig(AuthenticationConfiguration authenticationConfiguration) {
         this.authenticationConfiguration = authenticationConfiguration;
     }
 

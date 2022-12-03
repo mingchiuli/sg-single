@@ -1,7 +1,10 @@
 package com.chiu.sgsingle.document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -15,6 +18,9 @@ import java.time.ZonedDateTime;
  * @create 2022-11-30 8:55 pm
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Document(indexName = "bloginfo")
 public class BlogDocument implements Serializable {
 
@@ -32,7 +38,6 @@ public class BlogDocument implements Serializable {
     private String content;
     @Field(type = FieldType.Text)
     private String link;
-//    @JsonFormat(pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSXXX")
     @Field(type = FieldType.Date, format = DateFormat.date_optional_time)
     private ZonedDateTime created;
 }

@@ -14,11 +14,8 @@ import java.util.Map;
  */
 @RestController
 public class CaptchaController {
-
     CaptchaService captchaService;
-
-    @Autowired
-    public void setCaptchaService(CaptchaService captchaService) {
+    public CaptchaController(CaptchaService captchaService) {
         this.captchaService = captchaService;
     }
 

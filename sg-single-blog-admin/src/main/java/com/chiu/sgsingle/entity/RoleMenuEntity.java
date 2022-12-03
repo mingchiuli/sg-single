@@ -3,6 +3,9 @@ package com.chiu.sgsingle.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -18,6 +21,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@DynamicUpdate
 public class RoleMenuEntity implements Serializable {
 
     @Serial
@@ -25,7 +29,8 @@ public class RoleMenuEntity implements Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
     @Column(name = "role_id")

@@ -12,12 +12,10 @@ import com.chiu.sgsingle.repository.UserRepository;
 import com.chiu.sgsingle.search.BlogSearchIndexMessage;
 import com.chiu.sgsingle.service.BlogService;
 import com.chiu.sgsingle.vo.BlogEntityVo;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -29,6 +27,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -36,6 +35,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -47,31 +47,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class BlogServiceImpl implements BlogService {
     BlogRepository blogRepository;
-
     RedisTemplate<String, Object> redisTemplate;
-
     UserRepository userRepository;
-
     RabbitTemplate rabbitTemplate;
 
-    @Autowired
-    public void setRabbitTemplate(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
-
-    @Autowired
-    public void setBlogRepository(BlogRepository blogRepository) {
+    public BlogServiceImpl(BlogRepository blogRepository, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, RabbitTemplate rabbitTemplate) {
         this.blogRepository = blogRepository;
+        this.redisTemplate = redisTemplate;
+        this.userRepository = userRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Cache(prefix = Const.HOT_BLOG)
@@ -170,31 +154,62 @@ public class BlogServiceImpl implements BlogService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity user = userRepository.findByUsername(username);
         BlogEntity blogEntity;
+        BlogIndexEnum type;
         if (blog.getId() == null) {
-            blog.setCreated(LocalDateTime.now());
-            blog.setUserId(user.getId());
             blogEntity = new BlogEntity();
+            blogEntity.setCreated(LocalDateTime.now());
+            blogEntity.setUserId(user.getId());
+            blogEntity.setReadCount(0L);
+            type = BlogIndexEnum.CREATE;
         } else {
             Optional<BlogEntity> optionalBlog = blogRepository.findById(blog.getId());
             blogEntity = optionalBlog.orElseThrow();
             Assert.isTrue(blogEntity.getUserId().equals(user.getId()), "只能编辑自己的文章!");
+            type = BlogIndexEnum.UPDATE;
         }
         BeanUtils.copyProperties(blog, blogEntity);
-        blogRepository.save(blogEntity);
+        blogEntity = blogRepository.save(blogEntity);
 
         //通知消息给mq,更新并删除缓存
         CorrelationData correlationData = new CorrelationData();
         //防止重复消费
         redisTemplate.opsForValue().set(Const.CONSUME_MONITOR + correlationData.getId(),
-                        BlogIndexEnum.UPDATE.name() + "_" + blog.getId(),
+                        type.name() + "_" + blogEntity.getId(),
                         30,
                         TimeUnit.SECONDS);
 
         rabbitTemplate.convertAndSend(
                 RabbitConfig.ES_EXCHANGE,
                 RabbitConfig.ES_BINDING_KEY,
-                new BlogSearchIndexMessage(blog.getId(), BlogIndexEnum.UPDATE),
+                new BlogSearchIndexMessage(blogEntity.getId(), type, blogEntity.getCreated().getYear()),
                 correlationData);
     }
 
+
+    @Override
+    public void deleteBlogs(List<Long> ids) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        ids.forEach(id -> {
+            Optional<BlogEntity> optionalBlog = blogRepository.findById(id);
+            BlogEntity blogEntity = optionalBlog.orElseThrow();
+            blogRepository.delete(blogEntity);
+            redisTemplate.opsForValue().set( username + Const.QUERY_DELETED + id,
+                    blogEntity,
+                    7,
+                    TimeUnit.DAYS);
+
+            CorrelationData correlationData = new CorrelationData();
+            //防止重复消费
+            redisTemplate.opsForValue().set(Const.CONSUME_MONITOR + correlationData.getId(),
+                    BlogIndexEnum.REMOVE.name() + "_" +  id,
+                    30,
+                    TimeUnit.SECONDS);
+
+            rabbitTemplate.convertAndSend(
+                    RabbitConfig.ES_EXCHANGE,
+                    RabbitConfig.ES_BINDING_KEY,
+                    new BlogSearchIndexMessage(id, BlogIndexEnum.REMOVE, blogEntity.getCreated().getYear()), correlationData);
+        });
+    }
 }

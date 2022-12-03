@@ -15,18 +15,11 @@ import java.util.Optional;
 
 @Component
 public class UserDetailServiceImpl implements UserDetailsService {
-
 	RedisTemplate<String, Object> redisTemplate;
-
 	UserRepository userRepository;
 
-	@Autowired
-	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+	public UserDetailServiceImpl(RedisTemplate<String, Object> redisTemplate, UserRepository userRepository) {
 		this.redisTemplate = redisTemplate;
-	}
-
-	@Autowired
-	public void setSysUserService(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 

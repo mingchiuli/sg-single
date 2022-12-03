@@ -17,30 +17,17 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
-
 	ObjectMapper objectMapper;
-
 	JwtUtils jwtUtils;
-
 	RedisTemplate<String, Object> redisTemplate;
-
 	private final static SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
-
-	@Autowired
-	public void setObjectMapper(ObjectMapper objectMapper) {
+	public JwtLogoutSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils, RedisTemplate<String, Object> redisTemplate) {
 		this.objectMapper = objectMapper;
-	}
-
-	@Autowired
-	public void setJwtUtils(JwtUtils jwtUtils) {
 		this.jwtUtils = jwtUtils;
-	}
-
-	@Autowired
-	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
 		this.redisTemplate = redisTemplate;
 	}
+
 
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {

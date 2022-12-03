@@ -19,73 +19,28 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @Configuration(proxyBeanMethods = false)
 @EnableMethodSecurity
 public class SecurityConfig {
-
     LoginFailureHandler loginFailureHandler;
-
     LoginSuccessHandler loginSuccessHandler;
-
     CaptchaFilter captchaFilter;
-
     JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
-
     RedisTemplate<String, Object> redisTemplate;
-
     UserRepository userRepository;
     UserDetailsService userDetailsService;
-
     AuthenticationManager authenticationManager;
-
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Autowired
-    public void setJwtAuthenticationFilter(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
-
-    @Autowired
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
-    @Autowired
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
-    @Autowired
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setLoginFailureHandler(LoginFailureHandler loginFailureHandler) {
+    public SecurityConfig(LoginFailureHandler loginFailureHandler, LoginSuccessHandler loginSuccessHandler, CaptchaFilter captchaFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtLogoutSuccessHandler jwtLogoutSuccessHandler, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, UserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.loginFailureHandler = loginFailureHandler;
-    }
-    @Autowired
-    public void setLoginSuccessHandler(LoginSuccessHandler loginSuccessHandler) {
         this.loginSuccessHandler = loginSuccessHandler;
-    }
-
-    @Autowired
-    public void setCaptchaFilter(CaptchaFilter captchaFilter) {
         this.captchaFilter = captchaFilter;
-    }
-
-    @Autowired
-    public void setJwtAuthenticationEntryPoint(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-    }
-
-    @Autowired
-    public void setJwtLogoutSuccessHandler(JwtLogoutSuccessHandler jwtLogoutSuccessHandler) {
         this.jwtLogoutSuccessHandler = jwtLogoutSuccessHandler;
+        this.redisTemplate = redisTemplate;
+        this.userRepository = userRepository;
+        this.userDetailsService = userDetailsService;
+        this.authenticationManager = authenticationManager;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
 

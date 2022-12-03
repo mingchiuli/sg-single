@@ -15,7 +15,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     /**
      * 文件上传处理，URL映射到本地磁盘路径
      */
-
     @Value("${blog.add-resource-handler}")
     private String addResourceHandler;
 

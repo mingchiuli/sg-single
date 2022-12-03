@@ -1,5 +1,6 @@
 package com.chiu.sgsingle.vo;
 
+import com.chiu.sgsingle.valid.ListValue;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -23,7 +24,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BlogEntityVo {
     private Long id;
-    private Long userId;
 
     @NotBlank(message = "标题不能为空")
     private String title;
@@ -34,10 +34,7 @@ public class BlogEntityVo {
     @NotBlank(message = "内容不能为空")
     private String content;
 
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime created;
+    @ListValue(values = {0,1})
     private Integer status;
     private String link;
 }

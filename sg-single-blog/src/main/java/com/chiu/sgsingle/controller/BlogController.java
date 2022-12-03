@@ -8,7 +8,6 @@ import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.lang.Result;
 import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.service.BlogService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +20,8 @@ import java.util.List;
  */
 @RestController
 public class BlogController {
-
     BlogService blogService;
-
-    @Autowired
-    public void setBlogService(BlogService blogService) {
+    public BlogController(BlogService blogService) {
         this.blogService = blogService;
     }
 
@@ -38,7 +34,7 @@ public class BlogController {
     }
 
     @GetMapping("/blogAuthorized/{id}")
-    @PreAuthorize("hasRole(@highestRoleHolder.getHighestRole())")
+    @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
     public Result<BlogEntity> getLockedBlogDetail(@PathVariable(name = "id") Long id) {
         BlogEntity blog = blogService.findById(id);
         blogService.setReadCount(id);
@@ -46,7 +42,7 @@ public class BlogController {
     }
 
     @GetMapping("/blogs/{currentPage}")
-    @Cache(prefix = Const.HOT_BLOGS)//缓存页面信息
+    @Cache(prefix = Const.HOT_BLOGS)
     @Bloom(handler = ListBloomHandler.class)
     public Result<PageAdapter<BlogEntity>> listPage(@PathVariable(name = "currentPage") Integer currentPage) {
         PageAdapter<BlogEntity> pageData = blogService.listPage(currentPage);
@@ -54,7 +50,7 @@ public class BlogController {
     }
 
     @GetMapping("/blogsByYear/{year}/{currentPage}")
-    @Cache(prefix = Const.HOT_BLOGS)//缓存页面信息
+    @Cache(prefix = Const.HOT_BLOGS)
     @Bloom(handler = ListByYearBloomHandler.class)
     public Result<PageAdapter<BlogEntity>> listPageByYear(@PathVariable(name = "currentPage") Integer currentPage, @PathVariable(name = "year") Integer year) {
         PageAdapter<BlogEntity> pageData = blogService.listPageByYear(currentPage, year);

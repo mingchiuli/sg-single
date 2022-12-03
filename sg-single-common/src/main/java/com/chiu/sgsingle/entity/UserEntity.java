@@ -3,6 +3,8 @@ package com.chiu.sgsingle.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -18,6 +20,7 @@ import java.util.Objects;
 @ToString
 @RequiredArgsConstructor
 @Entity
+@DynamicUpdate
 @Table(name ="m_user")
 public class UserEntity implements Serializable {
 
@@ -26,7 +29,8 @@ public class UserEntity implements Serializable {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
+    @GenericGenerator(name = "native", strategy = "native")
     private Long id;
 
     @Column(name = "username")
