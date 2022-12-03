@@ -53,7 +53,7 @@ public class UpdateBlogIndexHandler extends BlogIndexHandler {
         countYear++;
         long pageYearNo = countYear % Const.PAGE_SIZE == 0 ? countYear / Const.PAGE_SIZE : countYear / Const.PAGE_SIZE + 1;
         String s = "::" + pageYearNo + "::" + blog.getCreated().getYear();
-        String pageYearNoPrefix = Const.HOT_BLOGS + "::BlogController::listByYear" + s;
+        String pageYearNoPrefix = Const.HOT_BLOGS + "::BlogController::listPageByYear" + s;
 
         //博客对象本身缓存
         StringBuilder builder = new StringBuilder();
