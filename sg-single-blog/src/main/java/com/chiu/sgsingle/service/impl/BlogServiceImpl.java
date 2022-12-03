@@ -1,5 +1,8 @@
 package com.chiu.sgsingle.service.impl;
 
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import com.chiu.sgsingle.document.BlogDocument;
+import com.chiu.sgsingle.dto.BlogEntityDto;
 import com.chiu.sgsingle.search.BlogIndexEnum;
 import com.chiu.sgsingle.cache.Cache;
 import com.chiu.sgsingle.config.RabbitConfig;
@@ -22,21 +25,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,16 +53,18 @@ public class BlogServiceImpl implements BlogService {
     UserRepository userRepository;
     RabbitTemplate rabbitTemplate;
 
-    public BlogServiceImpl(BlogRepository blogRepository, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, RabbitTemplate rabbitTemplate) {
+    ElasticsearchTemplate elasticsearchTemplate;
+    public BlogServiceImpl(BlogRepository blogRepository, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, RabbitTemplate rabbitTemplate, ElasticsearchTemplate elasticsearchTemplate) {
         this.blogRepository = blogRepository;
         this.redisTemplate = redisTemplate;
         this.userRepository = userRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
     @Cache(prefix = Const.HOT_BLOG)
     public BlogEntity findByIdAndStatus(Long id, Integer status) {
-        return blogRepository.findByIdAndStatus(id, status);
+        return blogRepository.findByIdAndStatus(id, status).orElseThrow();
     }
 
     @Async(value = "readCountThreadPoolExecutor")
@@ -118,7 +122,7 @@ public class BlogServiceImpl implements BlogService {
         String password = (String) redisTemplate.opsForValue().get(Const.READ_TOKEN);
         if (StringUtils.hasLength(token) && StringUtils.hasLength(password)) {
             if (token.equals(password)) {
-                return blogRepository.findByIdAndStatus(blogId, 1);
+                return blogRepository.findByIdAndStatus(blogId, 1).orElseThrow();
             }
         }
         return null;
@@ -211,5 +215,85 @@ public class BlogServiceImpl implements BlogService {
                     RabbitConfig.ES_BINDING_KEY,
                     new BlogSearchIndexMessage(id, BlogIndexEnum.REMOVE, blogEntity.getCreated().getYear()), correlationData);
         });
+    }
+
+    @Override
+    public void setBlogToken() {
+        String token = UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set(Const.READ_TOKEN, token, 24, TimeUnit.HOURS);
+    }
+
+    @Override
+    public String getBlogToken() {
+        String token = (String) redisTemplate.opsForValue().get(Const.READ_TOKEN);
+        if (token == null) {
+            token = "阅读密钥目前没有设置";
+        }
+        return token;
+    }
+
+    @Override
+    public PageAdapter<BlogEntityDto> getAllABlogs(Integer currentPage, Integer size) {
+        Pageable pageRequest = PageRequest.of(currentPage - 1, size, Sort.by("created").descending());
+        Page<BlogEntity> page = blogRepository.findAllAdmin(pageRequest);
+        ArrayList<BlogEntityDto> entities = new ArrayList<>();
+
+        page.getContent().forEach(blogEntity -> {
+            BlogEntityDto entityDto = new BlogEntityDto();
+            BeanUtils.copyProperties(blogEntity, entityDto);
+            Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + blogEntity.getId());
+            Optional<UserEntity> userEntity = userRepository.findUsernameById(blogEntity.getUserId());
+            entityDto.setUsername(userEntity.orElseThrow().getUsername());
+            entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
+            entities.add(entityDto);
+        });
+
+        return PageAdapter.<BlogEntityDto>builder().
+                content(entities).
+                last(page.isLast()).
+                first(page.isFirst()).
+                pageNumber(page.getNumber()).
+                totalPages(page.getTotalPages()).
+                pageSize(page.getSize()).
+                totalElements(page.getTotalElements()).
+                empty(page.isEmpty()).
+                build();
+    }
+
+    @Override
+    public PageAdapter<BlogEntityDto> searchAllBlogs(String keyword, Integer currentPage, Integer size) {
+        NativeQuery nativeQuery = NativeQuery.builder()
+                .withQuery(query ->
+                        query.multiMatch(multiQuery -> multiQuery.
+                                fields(Arrays.asList("title", "description", "content")).query(keyword)))
+                .withPageable(PageRequest.of(currentPage - 1, size))
+                .withSort(sortQuery -> sortQuery.
+                        field(fieldQuery -> fieldQuery.
+                                field("created").order(SortOrder.Desc))).build();
+
+        SearchHits<BlogDocument> search = elasticsearchTemplate.search(nativeQuery, BlogDocument.class);
+
+        List<BlogEntityDto> entities = new ArrayList<>();
+        search.getSearchHits().forEach(hit -> {
+            BlogDocument content = hit.getContent();
+            BlogEntityDto entityDto = new BlogEntityDto();
+            BeanUtils.copyProperties(content, entityDto);
+            Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + content.getId());
+            Optional<UserEntity> userEntity = userRepository.findUsernameById(content.getUserId());
+            entityDto.setUsername(userEntity.orElseThrow().getUsername());
+            entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
+            entities.add(entityDto);
+        });
+
+        return PageAdapter.<BlogEntityDto>builder().
+                totalPages((int) (search.getTotalHits() % size == 0 ? search.getTotalHits() / size : (search.getTotalHits() / size + 1))).
+                totalElements(search.getTotalHits()).
+                pageNumber(currentPage).
+                pageSize(size).
+                empty(search.isEmpty()).
+                first(currentPage == 1).
+                last(currentPage == (search.getTotalHits() % size == 0 ? search.getTotalHits() / size : search.getTotalHits() / size + 1)).
+                content(entities).
+                build();
     }
 }

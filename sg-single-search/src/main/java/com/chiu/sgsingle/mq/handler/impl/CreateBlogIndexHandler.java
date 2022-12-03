@@ -8,7 +8,6 @@ import com.chiu.sgsingle.repository.BlogRepository;
 import com.chiu.sgsingle.search.BlogIndexEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -24,7 +23,6 @@ public class CreateBlogIndexHandler extends BlogIndexHandler {
     ObjectMapper objectMapper;
     ElasticsearchTemplate elasticsearchTemplate;
 
-    @Autowired
     public CreateBlogIndexHandler(RedisTemplate<String, Object> redisTemplate, BlogRepository blogRepository, ObjectMapper objectMapper, ElasticsearchTemplate elasticsearchTemplate) {
         super(redisTemplate, blogRepository);
         this.objectMapper = objectMapper;

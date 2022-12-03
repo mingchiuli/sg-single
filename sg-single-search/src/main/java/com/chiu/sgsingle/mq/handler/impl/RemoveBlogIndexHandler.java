@@ -7,7 +7,6 @@ import com.chiu.sgsingle.mq.handler.BlogIndexHandler;
 import com.chiu.sgsingle.repository.BlogRepository;
 import com.chiu.sgsingle.search.BlogIndexEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,6 @@ public class RemoveBlogIndexHandler extends BlogIndexHandler {
     ObjectMapper objectMapper;
     ElasticsearchTemplate elasticsearchTemplate;
 
-    @Autowired
     public RemoveBlogIndexHandler(RedisTemplate<String, Object> redisTemplate, BlogRepository blogRepository, ElasticsearchTemplate elasticsearchTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, blogRepository);
         this.objectMapper = objectMapper;

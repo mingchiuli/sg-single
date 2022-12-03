@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author mingchiuli
@@ -18,12 +19,15 @@ import java.util.List;
 @Repository
 public interface BlogRepository extends CrudRepository<BlogEntity, Long> {
 
-    BlogEntity findByIdAndStatus(Long id, Integer status);
+    Optional<BlogEntity> findByIdAndStatus(Long id, Integer status);
 
     @Query(value = "UPDATE BlogEntity entity SET entity.readCount = entity.readCount + 1 WHERE entity.id = ?1")
     @Modifying
     @Transactional
     void setReadCount(Long id);
+
+    @Query(value = "SELECT new BlogEntity (id, userId,title, description, content, created, status, readCount) from BlogEntity")
+    Page<BlogEntity> findAllAdmin(Pageable pageRequest);
 
     @Query(value = "SELECT new BlogEntity (id, title, description, created, link) FROM BlogEntity")
     Page<BlogEntity> findAll(Pageable pageRequest);
@@ -39,8 +43,6 @@ public interface BlogRepository extends CrudRepository<BlogEntity, Long> {
 
     @Query(value = "SELECT distinct year(created) from m_blog order by year(created)", nativeQuery = true)
     List<Integer> searchYears();
-
-    List<BlogEntity> findAllByStatus(int status);
 
     @Query(value = "SELECT count(1) from m_blog", nativeQuery = true)
     Integer findCount();

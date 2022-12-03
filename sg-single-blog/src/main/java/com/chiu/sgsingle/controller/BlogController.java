@@ -33,7 +33,7 @@ public class BlogController {
         return Result.success(blog);
     }
 
-    @GetMapping("/blogAuthorized/{id}")
+    @GetMapping("/blog/authorized/{id}")
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
     public Result<BlogEntity> getLockedBlogDetail(@PathVariable(name = "id") Long id) {
         BlogEntity blog = blogService.findById(id);
@@ -49,7 +49,7 @@ public class BlogController {
         return Result.success(pageData);
     }
 
-    @GetMapping("/blogsByYear/{year}/{currentPage}")
+    @GetMapping("/blogs/year/{year}/{currentPage}")
     @Cache(prefix = Const.HOT_BLOGS)
     @Bloom(handler = ListByYearBloomHandler.class)
     public Result<PageAdapter<BlogEntity>> listPageByYear(@PathVariable(name = "currentPage") Integer currentPage, @PathVariable(name = "year") Integer year) {
@@ -57,7 +57,7 @@ public class BlogController {
         return Result.success(pageData);
     }
 
-    @GetMapping("/getCountByYear/{year}")
+    @GetMapping("/count/year/{year}")
     @Cache(prefix = Const.HOT_BLOGS)
     @Bloom(handler = CountByYearBloomHandler.class)
     public Result<Integer> getCountByYear(@PathVariable(name = "year") Integer year) {
@@ -65,21 +65,21 @@ public class BlogController {
         return Result.success(count);
     }
 
-    @GetMapping("blogToken/{blogId}/{token}")
+    @GetMapping("blog/token/{blogId}/{token}")
     public Result<BlogEntity> getLockedBlog(@PathVariable Long blogId, @PathVariable String token) {
         BlogEntity blog = blogService.getLockedBlog(blogId, token);
         return Result.success(blog);
     }
 
     @Bloom(handler = BlogStatusBloomHandler.class)
-    @GetMapping("/blogStatus/{blogId}")
+    @GetMapping("/blog/status/{blogId}")
     @Cache(prefix = Const.BLOG_STATUS)
     public Result<Integer> getBlogStatus(@PathVariable Long blogId) {
         Integer status = blogService.getBlogStatus(blogId);
         return Result.success(status);
     }
 
-    @GetMapping("/searchYears")
+    @GetMapping("/search/years")
     @Cache(prefix = Const.YEARS)
     public Result<List<Integer>> searchYears() {
         List<Integer> years = blogService.searchYears();

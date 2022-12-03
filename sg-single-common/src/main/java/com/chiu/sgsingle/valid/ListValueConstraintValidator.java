@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ListValueConstraintValidator implements ConstraintValidator<ListValue, Integer> {
-
     private Set<Integer> set;
 
     //初始化方法，拿到values的值

@@ -1,5 +1,6 @@
 package com.chiu.sgsingle.service;
 
+import com.chiu.sgsingle.dto.BlogEntityDto;
 import com.chiu.sgsingle.entity.BlogEntity;
 import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.vo.BlogEntityVo;
@@ -25,4 +26,8 @@ public interface BlogService {
     Integer count();
     void saveOrUpdate(BlogEntityVo blog);
     void deleteBlogs(List<Long> ids);
+    void setBlogToken();
+    String getBlogToken();
+    PageAdapter<BlogEntityDto> getAllABlogs(Integer currentPage, Integer size);
+    PageAdapter<BlogEntityDto> searchAllBlogs(String keyword, Integer currentPage, Integer size);
 }

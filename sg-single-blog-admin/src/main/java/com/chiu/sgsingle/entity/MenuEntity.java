@@ -18,6 +18,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@Builder
 @RequiredArgsConstructor
 @DynamicUpdate
 @Table(name ="m_menu")

@@ -18,6 +18,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @ToString
+@Builder
+@AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
 @DynamicUpdate
@@ -76,5 +78,9 @@ public class UserEntity implements Serializable {
         this.avatar = avatar;
         this.email = email;
         this.role = role;
+    }
+
+    public UserEntity(String username) {
+        this.username = username;
     }
 }

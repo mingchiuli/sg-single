@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -52,9 +51,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		Optional<Authentication> authOptional = Optional.of(authentication);
 
 
-		UserEntity user = userRepository.retrieveUserInfo(authOptional.
-				map(Principal::getName).
-				orElseThrow());
+		UserEntity user = userRepository.retrieveUserInfo(authOptional.map(Principal::getName).orElseThrow()).
+				orElseThrow();
 
 		userRepository.updateLoginTime(authOptional.
 				map(Principal::getName).

@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -18,6 +17,8 @@ import java.util.Objects;
 @Entity
 @Table(name ="m_role_menu")
 @Getter
+@AllArgsConstructor
+@Builder
 @Setter
 @ToString
 @RequiredArgsConstructor

@@ -6,13 +6,10 @@ import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.mq.handler.BlogIndexHandler;
 import com.chiu.sgsingle.repository.BlogRepository;
 import com.chiu.sgsingle.search.BlogIndexEnum;
-import com.chiu.sgsingle.service.BlogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -27,7 +24,6 @@ public class UpdateBlogIndexHandler extends BlogIndexHandler {
     ObjectMapper objectMapper;
     ElasticsearchTemplate elasticsearchTemplate;
 
-    @Autowired
     public UpdateBlogIndexHandler(RedisTemplate<String, Object> redisTemplate, BlogRepository blogRepository, ObjectMapper objectMapper, ElasticsearchTemplate elasticsearchTemplate) {
         super(redisTemplate, blogRepository);
         this.objectMapper = objectMapper;

@@ -7,7 +7,6 @@ import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.service.BlogSearchService;
 import com.chiu.sgsingle.vo.BlogDocumentVo;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -30,8 +29,7 @@ public class BlogSearchServiceImpl implements BlogSearchService {
 
     ElasticsearchTemplate elasticsearchTemplate;
 
-    @Autowired
-    public void setElasticsearchTemplate(ElasticsearchTemplate elasticsearchTemplate) {
+    public BlogSearchServiceImpl(ElasticsearchTemplate elasticsearchTemplate) {
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
 

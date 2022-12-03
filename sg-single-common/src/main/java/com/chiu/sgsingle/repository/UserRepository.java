@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * @author mingchiuli
@@ -21,6 +21,8 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     void updateLoginTime(String username, LocalDateTime time);
 
     @Query(value = "SELECT new UserEntity (id, username, avatar, email, role) from UserEntity where username = ?1")
-    UserEntity retrieveUserInfo(String orElseThrow);
+    Optional<UserEntity> retrieveUserInfo(String orElseThrow);
 
+    @Query(value = "SELECT new UserEntity (username) from UserEntity where id = ?1")
+    Optional<UserEntity> findUsernameById(Long userId);
 }

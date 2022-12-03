@@ -17,8 +17,6 @@ public class Const {
     public final static String HOT_BLOGS_PATTERN = "hot_blogs*";
 
     //url相关，不相关上传路径
-    public final static String UPLOAD_IMG_PATH = "/upload/img/";
-
     public static final String CO_PREFIX = "co_blogId:";
 
     public static final String CO_NUM_PREFIX = "co_num:";
