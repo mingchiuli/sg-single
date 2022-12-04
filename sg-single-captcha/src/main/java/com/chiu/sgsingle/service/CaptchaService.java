@@ -7,5 +7,6 @@ import java.util.Map;
  * @create 2022-11-27 8:27 pm
  */
 public interface CaptchaService {
+
     Map<String, String> createCaptcha();
 }

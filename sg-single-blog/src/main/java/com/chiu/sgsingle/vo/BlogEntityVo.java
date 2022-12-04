@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlogEntityVo {
+
     private Long id;
 
     @NotBlank(message = "标题不能为空")

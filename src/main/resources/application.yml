@@ -47,8 +47,6 @@ blog:
     core-size: 20
     max-size: 100
     keep-alive-time: 10
-  add-resource-handler: /upload/**
-  img-fold-name: img
   highest-role: admin
   default-role: boy,girl
   blog-page-size: 5

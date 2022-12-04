@@ -11,9 +11,9 @@ import com.chiu.sgsingle.entity.UserEntity;
 import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.repository.BlogRepository;
-import com.chiu.sgsingle.repository.UserRepository;
 import com.chiu.sgsingle.search.BlogSearchIndexMessage;
 import com.chiu.sgsingle.service.BlogService;
+import com.chiu.sgsingle.service.UserService;
 import com.chiu.sgsingle.vo.BlogEntityVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -48,16 +48,21 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class BlogServiceImpl implements BlogService {
+
     BlogRepository blogRepository;
+
     RedisTemplate<String, Object> redisTemplate;
-    UserRepository userRepository;
+
+    UserService userService;
+
     RabbitTemplate rabbitTemplate;
 
     ElasticsearchTemplate elasticsearchTemplate;
-    public BlogServiceImpl(BlogRepository blogRepository, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, RabbitTemplate rabbitTemplate, ElasticsearchTemplate elasticsearchTemplate) {
+
+    public BlogServiceImpl(BlogRepository blogRepository, RedisTemplate<String, Object> redisTemplate, UserService userService, RabbitTemplate rabbitTemplate, ElasticsearchTemplate elasticsearchTemplate) {
         this.blogRepository = blogRepository;
         this.redisTemplate = redisTemplate;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.rabbitTemplate = rabbitTemplate;
         this.elasticsearchTemplate = elasticsearchTemplate;
     }
@@ -156,19 +161,19 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public void saveOrUpdate(BlogEntityVo blog) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity user = userRepository.findByUsername(username);
+        Optional<UserEntity> user = userService.findByUsername(username);
         BlogEntity blogEntity;
         BlogIndexEnum type;
         if (blog.getId() == null) {
             blogEntity = new BlogEntity();
             blogEntity.setCreated(LocalDateTime.now());
-            blogEntity.setUserId(user.getId());
+            blogEntity.setUserId(user.orElseThrow().getId());
             blogEntity.setReadCount(0L);
             type = BlogIndexEnum.CREATE;
         } else {
             Optional<BlogEntity> optionalBlog = blogRepository.findById(blog.getId());
             blogEntity = optionalBlog.orElseThrow();
-            Assert.isTrue(blogEntity.getUserId().equals(user.getId()), "只能编辑自己的文章!");
+            Assert.isTrue(blogEntity.getUserId().equals(user.orElseThrow().getId()), "只能编辑自己的文章!");
             type = BlogIndexEnum.UPDATE;
         }
         BeanUtils.copyProperties(blog, blogEntity);
@@ -242,7 +247,7 @@ public class BlogServiceImpl implements BlogService {
             BlogEntityDto entityDto = new BlogEntityDto();
             BeanUtils.copyProperties(blogEntity, entityDto);
             Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + blogEntity.getId());
-            Optional<UserEntity> userEntity = userRepository.findUsernameById(blogEntity.getUserId());
+            Optional<UserEntity> userEntity = userService.findUsernameById(blogEntity.getUserId());
             entityDto.setUsername(userEntity.orElseThrow().getUsername());
             entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
             entities.add(entityDto);
@@ -279,7 +284,7 @@ public class BlogServiceImpl implements BlogService {
             BlogEntityDto entityDto = new BlogEntityDto();
             BeanUtils.copyProperties(content, entityDto);
             Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + content.getId());
-            Optional<UserEntity> userEntity = userRepository.findUsernameById(content.getUserId());
+            Optional<UserEntity> userEntity = userService.findUsernameById(content.getUserId());
             entityDto.setUsername(userEntity.orElseThrow().getUsername());
             entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
             entities.add(entityDto);

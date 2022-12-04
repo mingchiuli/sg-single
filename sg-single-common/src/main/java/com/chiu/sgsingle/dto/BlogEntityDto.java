@@ -16,13 +16,22 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class BlogEntityDto {
+
     private Long id;
+
     private String username;
+
     private String title;
+
     private String description;
+
     private String content;
+
     private LocalDateTime created;
+
     private Integer status;
+
     private Long readCount;
+
     private Integer readRecent;
 }

@@ -21,13 +21,21 @@ public class PageAdapter<T> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -3720998571176536865L;
+
     private List<T> content;
+
     private long totalElements;
+
     private int pageNumber;
+
     private int pageSize;
+
     private boolean first;
+
     private boolean last;
+
     private boolean empty;
+
     private int totalPages;
 
     //只用把原来的page类放进来即可

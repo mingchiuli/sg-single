@@ -46,6 +46,7 @@ public interface BlogRepository extends CrudRepository<BlogEntity, Long> {
 
     @Query(value = "SELECT count(1) from m_blog", nativeQuery = true)
     Integer findCount();
+
     @Query(value = "SELECT count(1) from m_blog where created > ?1", nativeQuery = true)
     long getPageCount(String created);
 

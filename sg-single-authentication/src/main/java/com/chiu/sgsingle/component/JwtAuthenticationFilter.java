@@ -10,7 +10,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -20,33 +19,26 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 import java.io.IOException;
 
 @Component
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
-	ObjectMapper objectMapper;
-	JwtUtils jwtUtils;
-	UserRepository userRepository;
-	RedisTemplate<String, Object> redisTemplate;
-	@Autowired
-	public void setObjectMapper(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
-	}
-	@Autowired
-	public void setJwtUtils(JwtUtils jwtUtils) {
-		this.jwtUtils = jwtUtils;
-	}
-	@Autowired
-	public void setUserRepository(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
-	@Autowired
-	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
-		this.redisTemplate = redisTemplate;
-	}
 
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+	ObjectMapper objectMapper;
+
+	JwtUtils jwtUtils;
+
+	UserRepository userRepository;
+
+	RedisTemplate<String, Object> redisTemplate;
+
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper, JwtUtils jwtUtils, UserRepository userRepository, RedisTemplate<String, Object> redisTemplate) {
 		super(authenticationManager);
+		this.jwtUtils = jwtUtils;
+		this.objectMapper = objectMapper;
+		this.userRepository = userRepository;
+		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -62,9 +54,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
 		try {
 			authentication = getAuthentication(jwt);
-		} catch (Exception e) {
+		} catch (JwtException e) {
 			response.setContentType("application/json;charset=utf-8");
-			response.getWriter().write(objectMapper.writeValueAsString(Result.fail(401, e.getMessage(), null)));
+			response.getWriter().write(objectMapper.writeValueAsString(Result.fail(401, e.getMessage())));
 			return;
 		}
 
@@ -85,6 +77,8 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
 		String username = claim.getSubject();
 		String role = (String) claim.get("authorization");
-		return new PreAuthenticatedAuthenticationToken(username, null, AuthorityUtils.createAuthorityList(role));
+		return new PreAuthenticatedAuthenticationToken(username,
+				null,
+				AuthorityUtils.createAuthorityList(role));
 	}
 }

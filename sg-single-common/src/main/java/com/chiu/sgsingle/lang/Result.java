@@ -12,7 +12,9 @@ import java.io.Serializable;
 public class Result<T> implements Serializable {
 
     private int status;
+
     private String msg;
+
     private T data;
 
     public static <T> Result<T> success(T data) {
@@ -38,4 +40,7 @@ public class Result<T> implements Serializable {
         return load(400, msg, null);
     }
 
+    public static Result<Object> fail(int status, String message) {
+        return load(status, message, null);
+    }
 }

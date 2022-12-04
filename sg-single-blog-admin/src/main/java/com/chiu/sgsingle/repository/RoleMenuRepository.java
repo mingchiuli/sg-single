@@ -1,8 +1,11 @@
 package com.chiu.sgsingle.repository;
 
 import com.chiu.sgsingle.entity.RoleMenuEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author mingchiuli
@@ -10,4 +13,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface RoleMenuRepository extends CrudRepository<RoleMenuEntity, Long> {
+    @Query(value = "SELECT menu_id from m_role_menu where role_id = ?1", nativeQuery = true)
+    List<Long> findMenuIdsByRoleId(Long id);
 }

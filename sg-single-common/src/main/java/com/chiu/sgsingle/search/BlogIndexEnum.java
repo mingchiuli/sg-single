@@ -6,6 +6,8 @@ package com.chiu.sgsingle.search;
  */
 public enum BlogIndexEnum {
     CREATE,
+
     UPDATE,
+
     REMOVE,
 }

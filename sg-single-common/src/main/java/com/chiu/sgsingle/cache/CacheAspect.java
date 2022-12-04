@@ -33,7 +33,9 @@ import java.util.concurrent.TimeUnit;
 public class CacheAspect {
 
     private static final String LOCK = "lock:";
+
     RedisTemplate<String, Object> redisTemplate;
+
     ObjectMapper objectMapper;
 
     public CacheAspect(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {

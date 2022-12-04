@@ -19,14 +19,23 @@ import java.time.ZonedDateTime;
 public class BlogDocumentVo implements Serializable {
 
     private Long id;
+
     private Long userId;
+
     private Integer status;
+
     private String title;
+
     private String description;
+
     private String content;
+
     private String link;
+
     private ZonedDateTime created;
+
     private Float score;
+
     private String highlight;
 
 }

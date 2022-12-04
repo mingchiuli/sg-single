@@ -9,7 +9,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -19,11 +18,13 @@ import java.io.IOException;
 
 @Component
 public class CaptchaFilter extends OncePerRequestFilter {
+
 	ObjectMapper objectMapper;
+
 	RedisTemplate<String, Object> redisTemplate;
+
 	LoginFailureHandler loginFailureHandler;
 
-	@Autowired
 	public CaptchaFilter(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate, LoginFailureHandler loginFailureHandler) {
 		this.objectMapper = objectMapper;
 		this.redisTemplate = redisTemplate;

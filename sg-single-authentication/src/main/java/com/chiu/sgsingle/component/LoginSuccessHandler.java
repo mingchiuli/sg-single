@@ -3,7 +3,7 @@ package com.chiu.sgsingle.component;
 import com.chiu.sgsingle.entity.UserEntity;
 import com.chiu.sgsingle.jwt.JwtUtils;
 import com.chiu.sgsingle.lang.Result;
-import com.chiu.sgsingle.repository.UserRepository;
+import com.chiu.sgsingle.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,13 +26,15 @@ import java.util.Optional;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 	ObjectMapper objectMapper;
-	JwtUtils jwtUtils;
-	UserRepository userRepository;
 
-	public LoginSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils, UserRepository userRepository) {
+	JwtUtils jwtUtils;
+
+	UserService userService;
+
+	public LoginSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils, UserService userService) {
 		this.objectMapper = objectMapper;
 		this.jwtUtils = jwtUtils;
-		this.userRepository = userRepository;
+		this.userService = userService;
 	}
 
 	@Override
@@ -50,11 +52,12 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		Optional<Authentication> authOptional = Optional.of(authentication);
 
-
-		UserEntity user = userRepository.retrieveUserInfo(authOptional.map(Principal::getName).orElseThrow()).
+		UserEntity user = userService.retrieveUserInfo(authOptional.
+						map(Principal::getName).
+						orElseThrow()).
 				orElseThrow();
 
-		userRepository.updateLoginTime(authOptional.
+		userService.updateLoginTime(authOptional.
 				map(Principal::getName).
 				orElseThrow(), LocalDateTime.now());
 

@@ -20,7 +20,9 @@ import java.util.List;
  */
 @RestController
 public class BlogController {
+
     BlogService blogService;
+
     public BlogController(BlogService blogService) {
         this.blogService = blogService;
     }

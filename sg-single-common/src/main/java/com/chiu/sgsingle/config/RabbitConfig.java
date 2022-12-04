@@ -19,7 +19,9 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class RabbitConfig {
     public static final String ES_QUEUE = "ex_queue";
+
     public static final String ES_EXCHANGE = "ex_exchange";
+
     public static final String ES_BINDING_KEY = "ex_exchange";
 
     //ES队列

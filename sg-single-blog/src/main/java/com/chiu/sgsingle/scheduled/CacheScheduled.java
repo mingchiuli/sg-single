@@ -25,8 +25,11 @@ import java.util.concurrent.TimeUnit;
 @Configuration(proxyBeanMethods = false)
 @Slf4j
 public class CacheScheduled {
+
     ThreadPoolExecutor executor;
+
     BlogService blogService;
+
     RedisTemplate<String, Object> redisTemplate;
 
     public CacheScheduled(@Qualifier("scheduledThreadPoolExecutor") ThreadPoolExecutor executor, BlogService blogService, RedisTemplate<String, Object> redisTemplate) {

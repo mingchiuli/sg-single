@@ -15,11 +15,12 @@ import java.util.List;
  * @create 2022-12-01 9:28 pm
  */
 @RestController
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/sys")
 @Validated
 public class BlogAdminController {
 
     BlogService blogService;
+
     public BlogAdminController(BlogService blogService) {
         this.blogService = blogService;
     }
@@ -58,7 +59,6 @@ public class BlogAdminController {
         PageAdapter<BlogEntityDto> page = blogService.getAllABlogs(currentPage, size);
         return Result.success(page);
     }
-
 
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
     @GetMapping("/search/blogs")

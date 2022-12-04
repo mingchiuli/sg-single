@@ -2,7 +2,6 @@ package com.chiu.sgsingle.config;
 
 import com.chiu.sgsingle.component.*;
 import com.chiu.sgsingle.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,14 +19,23 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
     LoginFailureHandler loginFailureHandler;
+
     LoginSuccessHandler loginSuccessHandler;
+
     CaptchaFilter captchaFilter;
+
     JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
     JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
+
     RedisTemplate<String, Object> redisTemplate;
+
     UserRepository userRepository;
+
     UserDetailsService userDetailsService;
+
     AuthenticationManager authenticationManager;
+
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(LoginFailureHandler loginFailureHandler, LoginSuccessHandler loginSuccessHandler, CaptchaFilter captchaFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtLogoutSuccessHandler jwtLogoutSuccessHandler, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, UserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtAuthenticationFilter jwtAuthenticationFilter) {

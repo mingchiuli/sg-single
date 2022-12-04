@@ -8,7 +8,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "blog.thread")
 @Data
 public class ThreadPoolConfigProperties {
+
     private Integer coreSize;
+
     private Integer maxSize;
+
     private Integer keepAliveTime;
 }
