@@ -100,7 +100,9 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public PageAdapter<BlogEntity> listPage(Integer currentPage) {
-        Pageable pageRequest = PageRequest.of(currentPage - 1, Const.PAGE_SIZE, Sort.by("created").descending());
+        Pageable pageRequest = PageRequest.of(currentPage - 1,
+                Const.PAGE_SIZE,
+                Sort.by("created").descending());
         Page<BlogEntity> page = blogRepository.findAll(pageRequest);
         return new PageAdapter<>(page);
     }
@@ -109,7 +111,9 @@ public class BlogServiceImpl implements BlogService {
     public PageAdapter<BlogEntity> listPageByYear(Integer currentPage, Integer year) {
         LocalDateTime start = LocalDateTime.of(year, 1, 1 , 0, 0, 0);
         LocalDateTime end = LocalDateTime.of(year, 12, 31 , 23, 59, 59);
-        Pageable pageRequest = PageRequest.of(currentPage - 1, Const.PAGE_SIZE, Sort.by("created").descending());
+        Pageable pageRequest = PageRequest.of(currentPage - 1,
+                Const.PAGE_SIZE,
+                Sort.by("created").descending());
         Page<BlogEntity> page = blogRepository.findAllByYear(pageRequest, start, end);
         return new PageAdapter<>(page);
     }
@@ -248,7 +252,7 @@ public class BlogServiceImpl implements BlogService {
             BeanUtils.copyProperties(blogEntity, entityDto);
             Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + blogEntity.getId());
             Optional<UserEntity> userEntity = userService.findUsernameById(blogEntity.getUserId());
-            entityDto.setUsername(userEntity.orElseThrow().getUsername());
+            entityDto.setUsername(userEntity.orElse(UserEntity.builder().username("anonymous").build()).getUsername());
             entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
             entities.add(entityDto);
         });
@@ -285,7 +289,7 @@ public class BlogServiceImpl implements BlogService {
             BeanUtils.copyProperties(content, entityDto);
             Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + content.getId());
             Optional<UserEntity> userEntity = userService.findUsernameById(content.getUserId());
-            entityDto.setUsername(userEntity.orElseThrow().getUsername());
+            entityDto.setUsername(userEntity.orElse(UserEntity.builder().username("anonymous").build()).getUsername());
             entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
             entities.add(entityDto);
         });

@@ -5,7 +5,6 @@ import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.service.BlogSearchService;
 import com.chiu.sgsingle.valid.ListValue;
 import com.chiu.sgsingle.vo.BlogDocumentVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -7,7 +7,9 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
@@ -23,8 +25,7 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 
 	RedisTemplate<String, Object> redisTemplate;
 
-	private final static SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-
+	private final static LogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
 	public JwtLogoutSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils, RedisTemplate<String, Object> redisTemplate) {
 		this.objectMapper = objectMapper;
@@ -32,11 +33,10 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 		this.redisTemplate = redisTemplate;
 	}
 
-
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
 		logoutHandler.logout(request, response, authentication);
-		response.setContentType("application/json;charset=UTF-8");
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		ServletOutputStream outputStream = response.getOutputStream();
 
 		response.setHeader(jwtUtils.getHeader(), "");

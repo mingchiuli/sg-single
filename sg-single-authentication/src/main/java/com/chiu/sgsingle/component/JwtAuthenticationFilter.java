@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -55,7 +56,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 		try {
 			authentication = getAuthentication(jwt);
 		} catch (JwtException e) {
-			response.setContentType("application/json;charset=utf-8");
+			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			response.getWriter().write(objectMapper.writeValueAsString(Result.fail(401, e.getMessage())));
 			return;
 		}

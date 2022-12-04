@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -38,28 +39,20 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 	}
 
 	@Override
-	@Transactional
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-		response.setContentType("application/json;charset=UTF-8");
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		ServletOutputStream outputStream = response.getOutputStream();
 
 		// 生成jwt
 		String jwt = jwtUtils.generateToken(authentication.getName(),
-				authentication.getAuthorities().stream().
-						findFirst().
-						map(GrantedAuthority::getAuthority).
-						orElse("ROLE_default"));
+				authentication.getAuthorities().stream().findFirst().map(GrantedAuthority::getAuthority).orElse("ROLE_default"));
 
 		Optional<Authentication> authOptional = Optional.of(authentication);
 
-		UserEntity user = userService.retrieveUserInfo(authOptional.
-						map(Principal::getName).
-						orElseThrow()).
-				orElseThrow();
+		UserEntity user = userService.retrieveUserInfo(authOptional.map(Principal::getName).orElseThrow()).orElseThrow();
 
-		userService.updateLoginTime(authOptional.
-				map(Principal::getName).
-				orElseThrow(), LocalDateTime.now());
+		userService.updateLoginTime(authOptional.map(Principal::getName).orElseThrow(),
+				LocalDateTime.now());
 
 		HashMap<String, Object> map = new HashMap<>();
 		map.put("user", user);

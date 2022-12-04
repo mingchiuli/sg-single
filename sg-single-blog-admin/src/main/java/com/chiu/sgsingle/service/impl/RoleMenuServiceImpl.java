@@ -1,7 +1,6 @@
 package com.chiu.sgsingle.service.impl;
 
 import com.chiu.sgsingle.entity.RoleEntity;
-import com.chiu.sgsingle.entity.RoleMenuEntity;
 import com.chiu.sgsingle.repository.RoleMenuRepository;
 import com.chiu.sgsingle.service.RoleMenuService;
 import com.chiu.sgsingle.service.RoleService;
