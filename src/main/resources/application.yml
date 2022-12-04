@@ -1,5 +1,14 @@
 # DataSource Config
 spring:
+  devtools:
+    add-properties: false
+  data:
+    elasticsearch:
+      repositories:
+        enabled: false
+    redis:
+      repositories:
+        enabled: false
   jpa:
     database: MYSQL
     show-sql: true
@@ -52,6 +61,3 @@ blog:
   blog-page-size: 5
   web-page-size: 9
 
-#logging:
-#  level:
-#    com.markerhub.mapper: debug

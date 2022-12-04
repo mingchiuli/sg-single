@@ -3,9 +3,9 @@ package com.chiu.sgsingle.repository;
 import com.chiu.sgsingle.entity.BlogEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * @create 2022-11-27 1:30 am
  */
 @Repository
-public interface BlogRepository extends CrudRepository<BlogEntity, Long> {
+public interface BlogRepository extends JpaRepository<BlogEntity, Long> {
 
     Optional<BlogEntity> findByIdAndStatus(Long id, Integer status);
 
