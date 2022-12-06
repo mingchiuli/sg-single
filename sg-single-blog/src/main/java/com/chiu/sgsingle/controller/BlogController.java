@@ -11,6 +11,7 @@ import com.chiu.sgsingle.service.BlogService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
  * @create 2022-11-26 5:30 pm
  */
 @RestController
+@RequestMapping(value = "/public")
 public class BlogController {
 
     BlogService blogService;

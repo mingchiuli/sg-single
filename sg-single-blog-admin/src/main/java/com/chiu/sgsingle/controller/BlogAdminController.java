@@ -16,7 +16,7 @@ import java.util.List;
  * @create 2022-12-01 9:28 pm
  */
 @RestController
-@RequestMapping(value = "/sys")
+@RequestMapping(value = "/sys/blog")
 @Validated
 public class BlogAdminController {
 
@@ -27,35 +27,35 @@ public class BlogAdminController {
     }
 
     @PreAuthorize("hasAnyRole(@highestRoleHolder.getRole(), @defaultRoleHolder.getRole())")
-    @PostMapping("/blog/edit")
+    @PostMapping("/edit")
     public Result<Object> saveOrUpdate(@RequestBody @Validated BlogEntityVo blog) {
         blogService.saveOrUpdate(blog);
         return Result.success();
     }
 
     @PreAuthorize("hasAnyRole(@highestRoleHolder.getRole())")
-    @PostMapping("/blog/delete")
+    @PostMapping("/delete")
     public Result<Object> deleteBlogs(@RequestBody List<Long> ids) {
         blogService.deleteBlogs(ids);
         return Result.success();
     }
 
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
-    @GetMapping("/set/blog/token")
+    @GetMapping("/set/token")
     public Result<Object> setBlogToken() {
         blogService.setBlogToken();
         return Result.success();
     }
 
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
-    @GetMapping("/get/blog/token")
+    @GetMapping("/get/token")
     public Result<String> getBlogToken() {
         String token = blogService.getBlogToken();
         return Result.success(token);
     }
 
     @PreAuthorize("hasAnyRole(@highestRoleHolder.getRole(), @defaultRoleHolder.getRole())")
-    @GetMapping("/blogs/get")
+    @GetMapping("/get/blogs")
     public Result<PageAdapter<BlogEntityDto>> getAllBlogs(@RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "5") Integer size) {
         PageAdapter<BlogEntityDto> page = blogService.getAllABlogs(currentPage, size);
         return Result.success(page);
