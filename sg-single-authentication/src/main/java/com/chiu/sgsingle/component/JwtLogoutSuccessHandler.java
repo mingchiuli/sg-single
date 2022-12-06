@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -23,14 +22,11 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 
 	JwtUtils jwtUtils;
 
-	RedisTemplate<String, Object> redisTemplate;
-
 	private final static LogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
-	public JwtLogoutSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils, RedisTemplate<String, Object> redisTemplate) {
+	public JwtLogoutSuccessHandler(ObjectMapper objectMapper, JwtUtils jwtUtils) {
 		this.objectMapper = objectMapper;
 		this.jwtUtils = jwtUtils;
-		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -38,11 +34,10 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
 		logoutHandler.logout(request, response, authentication);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		ServletOutputStream outputStream = response.getOutputStream();
-
 		response.setHeader(jwtUtils.getHeader(), "");
 		Result<String> result = Result.success("");
-
 		outputStream.write(objectMapper.writeValueAsString(result).getBytes(StandardCharsets.UTF_8));
+
 		outputStream.flush();
 		outputStream.close();
 	}

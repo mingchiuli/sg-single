@@ -3,15 +3,15 @@ package com.chiu.sgsingle.bloom.handler.impl;
 import com.chiu.sgsingle.bloom.handler.BloomHandler;
 import com.chiu.sgsingle.exception.NotFoundException;
 import com.chiu.sgsingle.lang.Const;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BlogStatusBloomHandler implements BloomHandler {
 
-    RedisTemplate<String, Object> redisTemplate;
+    StringRedisTemplate redisTemplate;
 
-    public BlogStatusBloomHandler(RedisTemplate<String, Object> redisTemplate) {
+    public BlogStatusBloomHandler(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 

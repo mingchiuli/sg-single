@@ -9,6 +9,7 @@ import com.chiu.sgsingle.search.BlogIndexEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class RemoveBlogIndexHandler extends BlogIndexHandler {
     ObjectMapper objectMapper;
     ElasticsearchTemplate elasticsearchTemplate;
 
-    public RemoveBlogIndexHandler(RedisTemplate<String, Object> redisTemplate, BlogRepository blogRepository, ElasticsearchTemplate elasticsearchTemplate, ObjectMapper objectMapper) {
+    public RemoveBlogIndexHandler(StringRedisTemplate redisTemplate, BlogRepository blogRepository, ElasticsearchTemplate elasticsearchTemplate, ObjectMapper objectMapper) {
         super(redisTemplate, blogRepository);
         this.objectMapper = objectMapper;
         this.elasticsearchTemplate = elasticsearchTemplate;

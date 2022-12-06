@@ -10,7 +10,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -22,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
@@ -32,14 +32,11 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
 	UserRepository userRepository;
 
-	RedisTemplate<String, Object> redisTemplate;
-
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper, JwtUtils jwtUtils, UserRepository userRepository, RedisTemplate<String, Object> redisTemplate) {
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper, JwtUtils jwtUtils, UserRepository userRepository) {
 		super(authenticationManager);
 		this.jwtUtils = jwtUtils;
 		this.objectMapper = objectMapper;
 		this.userRepository = userRepository;
-		this.redisTemplate = redisTemplate;
 	}
 
 	@Override
@@ -68,10 +65,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 	}
 
 	private Authentication getAuthentication(String jwt) {
-		Claims claim = jwtUtils.getClaimByToken(jwt);
-		if (claim == null) {
-			throw new JwtException("token异常，请重新登录");
-		}
+		Optional<Claims> claimsOptional = Optional.ofNullable(jwtUtils.getClaimByToken(jwt));
+		Claims claim = claimsOptional.orElseThrow(() -> new JwtException("token异常，请重新登录"));
+
 		if (jwtUtils.isTokenExpired(claim.getExpiration())) {
 			throw new JwtException("token已过期，请重新登录");
 		}

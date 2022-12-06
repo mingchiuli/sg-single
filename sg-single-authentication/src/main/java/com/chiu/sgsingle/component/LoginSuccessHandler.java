@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -54,7 +53,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		userService.updateLoginTime(authOptional.map(Principal::getName).orElseThrow(),
 				LocalDateTime.now());
 
-		HashMap<String, Object> map = new HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("user", user);
 		map.put("token", jwt);
 

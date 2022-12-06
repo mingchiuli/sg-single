@@ -24,12 +24,9 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
-
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		ServletOutputStream outputStream = response.getOutputStream();
-
 		Result<Object> result = Result.fail(401, exception.getMessage());
-
 		outputStream.write(objectMapper.writeValueAsString(result).getBytes(StandardCharsets.UTF_8));
 
 		outputStream.flush();

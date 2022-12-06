@@ -4,15 +4,15 @@ import com.chiu.sgsingle.exception.CaptchaException;
 import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.lang.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,11 +22,11 @@ public class CaptchaFilter extends OncePerRequestFilter {
 
 	ObjectMapper objectMapper;
 
-	RedisTemplate<String, Object> redisTemplate;
+	StringRedisTemplate redisTemplate;
 
 	LoginFailureHandler loginFailureHandler;
 
-	public CaptchaFilter(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate, LoginFailureHandler loginFailureHandler) {
+	public CaptchaFilter(ObjectMapper objectMapper, StringRedisTemplate redisTemplate, LoginFailureHandler loginFailureHandler) {
 		this.objectMapper = objectMapper;
 		this.redisTemplate = redisTemplate;
 		this.loginFailureHandler = loginFailureHandler;
@@ -57,10 +57,9 @@ public class CaptchaFilter extends OncePerRequestFilter {
 		String code = httpServletRequest.getParameter("code");
 		String key = httpServletRequest.getParameter("key");
 
-		if (StringUtils.isBlank(code) || StringUtils.isBlank(key)) {
+		if (!StringUtils.hasLength(code) || !StringUtils.hasLength(key)) {
 			throw new CaptchaException("验证码无效");
 		}
-
 		if (!code.equals(redisTemplate.opsForValue().get(Const.CAPTCHA_KEY + key))) {
 			redisTemplate.delete(Const.CAPTCHA_KEY + key);
 			throw new CaptchaException("验证码错误");

@@ -4,8 +4,7 @@ import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.service.CaptchaService;
 import com.google.code.kaptcha.Producer;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -23,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
     Producer producer;
-    RedisTemplate<String, Object> redisTemplate;
-    public CaptchaServiceImpl(Producer producer, RedisTemplate<String, Object> redisTemplate) {
+    StringRedisTemplate redisTemplate;
+    public CaptchaServiceImpl(Producer producer, StringRedisTemplate redisTemplate) {
         this.producer = producer;
         this.redisTemplate = redisTemplate;
     }

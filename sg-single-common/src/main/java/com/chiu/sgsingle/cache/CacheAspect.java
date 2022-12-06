@@ -11,7 +11,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.core.NestedRuntimeException;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
@@ -34,11 +34,11 @@ public class CacheAspect {
 
     private static final String LOCK = "lock:";
 
-    RedisTemplate<String, Object> redisTemplate;
+    StringRedisTemplate redisTemplate;
 
     ObjectMapper objectMapper;
 
-    public CacheAspect(RedisTemplate<String, Object> redisTemplate, ObjectMapper objectMapper) {
+    public CacheAspect(StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
     }
@@ -121,7 +121,7 @@ public class CacheAspect {
             }
             //执行目标方法
             Object proceed = pjp.proceed();
-            redisTemplate.opsForValue().set(redisKey, proceed, expire, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(redisKey, objectMapper.writeValueAsString(proceed), expire, TimeUnit.SECONDS);
             return proceed;
         }
     }

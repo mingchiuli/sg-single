@@ -2,7 +2,6 @@ package com.chiu.sgsingle.component;
 
 import com.chiu.sgsingle.entity.UserEntity;
 import com.chiu.sgsingle.service.UserService;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,12 +13,9 @@ import java.util.Optional;
 
 @Component
 public class UserDetailServiceImpl implements UserDetailsService {
-	RedisTemplate<String, Object> redisTemplate;
-
 	UserService userService;
 
-	public UserDetailServiceImpl(RedisTemplate<String, Object> redisTemplate, UserService userService) {
-		this.redisTemplate = redisTemplate;
+	public UserDetailServiceImpl(UserService userService) {
 		this.userService = userService;
 	}
 

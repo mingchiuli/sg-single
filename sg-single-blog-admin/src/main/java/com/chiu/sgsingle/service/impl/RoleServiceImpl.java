@@ -21,7 +21,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleEntity findByCode(String role) {
-        Optional<RoleEntity> roleEntity = roleRepository.findByCode(role);
-        return roleEntity.orElseThrow();
+        return roleRepository.findByCode(role).orElseThrow();
     }
 }

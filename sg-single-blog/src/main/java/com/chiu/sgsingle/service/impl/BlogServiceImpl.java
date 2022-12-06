@@ -15,6 +15,8 @@ import com.chiu.sgsingle.search.BlogSearchIndexMessage;
 import com.chiu.sgsingle.service.BlogService;
 import com.chiu.sgsingle.service.UserService;
 import com.chiu.sgsingle.vo.BlogEntityVo;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -29,14 +31,15 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SessionCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +54,9 @@ public class BlogServiceImpl implements BlogService {
 
     BlogRepository blogRepository;
 
-    RedisTemplate<String, Object> redisTemplate;
+    StringRedisTemplate redisTemplate;
+
+    ObjectMapper objectMapper;
 
     UserService userService;
 
@@ -59,9 +64,10 @@ public class BlogServiceImpl implements BlogService {
 
     ElasticsearchTemplate elasticsearchTemplate;
 
-    public BlogServiceImpl(BlogRepository blogRepository, RedisTemplate<String, Object> redisTemplate, UserService userService, RabbitTemplate rabbitTemplate, ElasticsearchTemplate elasticsearchTemplate) {
+    public BlogServiceImpl(BlogRepository blogRepository, StringRedisTemplate redisTemplate, ObjectMapper objectMapper, UserService userService, RabbitTemplate rabbitTemplate, ElasticsearchTemplate elasticsearchTemplate) {
         this.blogRepository = blogRepository;
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
         this.userService = userService;
         this.rabbitTemplate = rabbitTemplate;
         this.elasticsearchTemplate = elasticsearchTemplate;
@@ -128,7 +134,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogEntity getLockedBlog(Long blogId, String token) {
         token = token.trim();
-        String password = (String) redisTemplate.opsForValue().get(Const.READ_TOKEN);
+        String password = redisTemplate.opsForValue().get(Const.READ_TOKEN);
         if (StringUtils.hasLength(token) && StringUtils.hasLength(password)) {
             if (token.equals(password)) {
                 return blogRepository.findByIdAndStatus(blogId, 1).orElseThrow();
@@ -200,23 +206,24 @@ public class BlogServiceImpl implements BlogService {
     }
 
 
+    @SneakyThrows
     @Override
     public void deleteBlogs(List<Long> ids) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        ids.forEach(id -> {
+        for (Long id : ids) {
             Optional<BlogEntity> optionalBlog = blogRepository.findById(id);
             BlogEntity blogEntity = optionalBlog.orElseThrow();
             blogRepository.delete(blogEntity);
-            redisTemplate.opsForValue().set( username + Const.QUERY_DELETED + id,
-                    blogEntity,
+            redisTemplate.opsForValue().set(username + Const.QUERY_DELETED + id,
+                    objectMapper.writeValueAsString(blogEntity),
                     7,
                     TimeUnit.DAYS);
 
             CorrelationData correlationData = new CorrelationData();
             //防止重复消费
             redisTemplate.opsForValue().set(Const.CONSUME_MONITOR + correlationData.getId(),
-                    BlogIndexEnum.REMOVE.name() + "_" +  id,
+                    BlogIndexEnum.REMOVE.name() + "_" + id,
                     30,
                     TimeUnit.SECONDS);
 
@@ -224,7 +231,7 @@ public class BlogServiceImpl implements BlogService {
                     RabbitConfig.ES_EXCHANGE,
                     RabbitConfig.ES_BINDING_KEY,
                     new BlogSearchIndexMessage(id, BlogIndexEnum.REMOVE, blogEntity.getCreated().getYear()), correlationData);
-        });
+        }
     }
 
     @Override
@@ -235,8 +242,9 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public String getBlogToken() {
-        String token = (String) redisTemplate.opsForValue().get(Const.READ_TOKEN);
-        return Optional.ofNullable(token).orElse("阅读密钥目前没有设置");
+
+        return Optional.ofNullable(redisTemplate.opsForValue().get(Const.READ_TOKEN)).
+                orElse("阅读密钥目前没有设置");
     }
 
     @Override
@@ -248,10 +256,10 @@ public class BlogServiceImpl implements BlogService {
         page.getContent().forEach(blogEntity -> {
             BlogEntityDto entityDto = new BlogEntityDto();
             BeanUtils.copyProperties(blogEntity, entityDto);
-            Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + blogEntity.getId());
+            Integer readNum = Integer.valueOf(Optional.ofNullable(redisTemplate.opsForValue().get(Const.READ_RECENT + blogEntity.getId())).orElse("0"));
             Optional<UserEntity> userEntity = userService.findUsernameById(blogEntity.getUserId());
             entityDto.setUsername(userEntity.orElse(UserEntity.builder().username("anonymous").build()).getUsername());
-            entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
+            entityDto.setReadRecent(readNum);
             entities.add(entityDto);
         });
 
@@ -285,10 +293,10 @@ public class BlogServiceImpl implements BlogService {
             BlogDocument content = hit.getContent();
             BlogEntityDto entityDto = new BlogEntityDto();
             BeanUtils.copyProperties(content, entityDto);
-            Integer readNum = (Integer) redisTemplate.opsForValue().get(Const.READ_RECENT + content.getId());
+            Integer readNum = Integer.valueOf(Optional.ofNullable(redisTemplate.opsForValue().get(Const.READ_RECENT + content.getId())).orElse("0"));
             Optional<UserEntity> userEntity = userService.findUsernameById(content.getUserId());
             entityDto.setUsername(userEntity.orElse(UserEntity.builder().username("anonymous").build()).getUsername());
-            entityDto.setReadRecent(Objects.requireNonNullElse(readNum, 0));
+            entityDto.setReadRecent(readNum);
             entities.add(entityDto);
         });
 

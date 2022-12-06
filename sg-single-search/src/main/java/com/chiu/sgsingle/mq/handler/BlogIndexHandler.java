@@ -9,16 +9,17 @@ import com.rabbitmq.client.Channel;
 import lombok.SneakyThrows;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.connection.PublisherCallbackChannel;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 
 public abstract class BlogIndexHandler {
 
-    protected RedisTemplate<String, Object> redisTemplate;
+    protected StringRedisTemplate redisTemplate;
     protected BlogRepository blogRepository;
-    public BlogIndexHandler(RedisTemplate<String, Object> redisTemplate, BlogRepository blogRepository) {
+    public BlogIndexHandler(StringRedisTemplate redisTemplate, BlogRepository blogRepository) {
         this.redisTemplate = redisTemplate;
         this.blogRepository = blogRepository;
     }
