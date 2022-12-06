@@ -51,6 +51,35 @@ public class MenuServiceImpl implements MenuService {
 
     }
 
+    @Override
+    public MenuEntity findById(Long id) {
+        return menuRepository.findById(id).orElseThrow();
+    }
+
+    @Override
+    public List<MenuEntityVo> tree() {
+        List<MenuEntity> menus =  menuRepository.findAllByOrderByOrderNumDesc();
+        ArrayList<MenuEntityVo> entityVos = new ArrayList<>();
+        menus.forEach(menu -> {
+            MenuEntityVo menuEntityVo = new MenuEntityVo();
+            BeanUtils.copyProperties(menu, menuEntityVo);
+            entityVos.add(menuEntityVo);
+        });
+        return buildTreeMenu(entityVos);
+    }
+
+    @Override
+    public void save(MenuEntityVo menu) {
+        MenuEntity menuEntity = new MenuEntity();
+        BeanUtils.copyProperties(menu, menuEntity);
+        menuRepository.save(menuEntity);
+    }
+
+    @Override
+    public void delete(Long id) {
+        menuRepository.deleteById(id);
+    }
+
     private List<MenuEntityVo> buildTreeMenu(List<MenuEntityVo> menus) {
         //2.组装父子的树形结构
         //2.1 找到所有一级分类

@@ -1,5 +1,7 @@
 package com.chiu.sgsingle.vo;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,8 +19,10 @@ public class MenuEntityVo implements Serializable {
 
     private Long parentId;
 
+    @NotBlank
     private String title;
 
+    @NotBlank
     private String name;
 
     private String url;
@@ -29,8 +33,10 @@ public class MenuEntityVo implements Serializable {
 
     private String icon;
 
+    @NotNull
     private Integer orderNum;
 
+    @NotNull
     private Integer status;
 
     private List<MenuEntityVo> children = new ArrayList<>();

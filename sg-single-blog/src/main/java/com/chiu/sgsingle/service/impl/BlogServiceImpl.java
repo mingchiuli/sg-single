@@ -136,7 +136,7 @@ public class BlogServiceImpl implements BlogService {
         token = token.trim();
         String password = redisTemplate.opsForValue().get(Const.READ_TOKEN);
         if (StringUtils.hasLength(token) && StringUtils.hasLength(password)) {
-            if (token.equals(password)) {
+            if (password.equals(token)) {
                 return blogRepository.findByIdAndStatus(blogId, 1).orElseThrow();
             }
         }
@@ -242,7 +242,6 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public String getBlogToken() {
-
         return Optional.ofNullable(redisTemplate.opsForValue().get(Const.READ_TOKEN)).
                 orElse("阅读密钥目前没有设置");
     }

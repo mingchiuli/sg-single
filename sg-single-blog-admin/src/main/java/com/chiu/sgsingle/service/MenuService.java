@@ -1,5 +1,6 @@
 package com.chiu.sgsingle.service;
 
+import com.chiu.sgsingle.entity.MenuEntity;
 import com.chiu.sgsingle.vo.MenuEntityVo;
 
 import java.util.List;
@@ -11,4 +12,12 @@ import java.util.List;
 public interface MenuService {
 
     List<MenuEntityVo> getCurrentUserNav(String username);
+
+    MenuEntity findById(Long id);
+
+    List<MenuEntityVo> tree();
+
+    void save(MenuEntityVo menu);
+
+    void delete(Long id);
 }

@@ -5,11 +5,13 @@ import com.chiu.sgsingle.lang.Const;
 import com.chiu.sgsingle.lang.Result;
 import com.chiu.sgsingle.page.PageAdapter;
 import com.chiu.sgsingle.service.BlogService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -29,12 +31,15 @@ public class CacheScheduled {
 
     BlogService blogService;
 
-    RedisTemplate<String, Object> redisTemplate;
+    StringRedisTemplate redisTemplate;
 
-    public CacheScheduled(@Qualifier("scheduledThreadPoolExecutor") ThreadPoolExecutor executor, BlogService blogService, RedisTemplate<String, Object> redisTemplate) {
+    ObjectMapper objectMapper;
+
+    public CacheScheduled(@Qualifier("scheduledThreadPoolExecutor") ThreadPoolExecutor executor, BlogService blogService, StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
         this.executor = executor;
         this.blogService = blogService;
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @SneakyThrows
@@ -56,8 +61,16 @@ public class CacheScheduled {
                 String contentPrefix = Const.HOT_BLOG + "::BlogServiceImpl::getBlogDetail" + builder;
                 String statusPrefix = Const.BLOG_STATUS + "::BlogController::getBlogStatus" + builder;
 
-                redisTemplate.opsForValue().set(contentPrefix, blog, ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
-                redisTemplate.opsForValue().set(statusPrefix, Result.success(blog.getStatus()), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+                try {
+                    redisTemplate.opsForValue().set(contentPrefix, objectMapper.writeValueAsString(blog),
+                            ThreadLocalRandom.current().nextInt(120) + 1,
+                            TimeUnit.MINUTES);
+                    redisTemplate.opsForValue().set(statusPrefix, objectMapper.writeValueAsString(Result.success(blog.getStatus())),
+                            ThreadLocalRandom.current().nextInt(120) + 1,
+                            TimeUnit.MINUTES);
+                } catch (JsonProcessingException e) {
+                    log.info(e.getMessage());
+                }
             });
 
             //bloomFilter
@@ -75,7 +88,13 @@ public class CacheScheduled {
             for (int no = 1; no <= totalPage; no++) {
                 PageAdapter<BlogEntity> page = blogService.listPage(no);
                 String pagesPrefix = Const.HOT_BLOGS + "::BlogController::listPage" + "::" + no;
-                redisTemplate.opsForValue().set(pagesPrefix, Result.success(page), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+                try {
+                    redisTemplate.opsForValue().set(pagesPrefix, objectMapper.writeValueAsString(Result.success(page)),
+                            ThreadLocalRandom.current().nextInt(120) + 1,
+                            TimeUnit.MINUTES);
+                } catch (JsonProcessingException e) {
+                    log.info(e.getMessage());
+                }
                 //bloomFilter
                 redisTemplate.opsForValue().setBit(Const.BLOOM_FILTER_PAGE, no, true);
             }
@@ -87,7 +106,11 @@ public class CacheScheduled {
             years.forEach(year -> {
                 Integer countYear = blogService.getCountByYear(year);
                 String yearCountPrefix = Const.HOT_BLOGS + "::BlogController::getCountByYear" + "::" + year;
-                redisTemplate.opsForValue().set(yearCountPrefix, Result.success(countYear), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+                try {
+                    redisTemplate.opsForValue().set(yearCountPrefix, objectMapper.writeValueAsString(Result.success(countYear)), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+                } catch (JsonProcessingException e) {
+                    log.info(e.getMessage());
+                }
             });
         }, executor);
 
@@ -103,7 +126,11 @@ public class CacheScheduled {
                     //每一页的缓存
                     PageAdapter<BlogEntity> page = blogService.listPageByYear(no, year);
                     String yearListPrefix = Const.HOT_BLOGS + "::BlogController::listPageByYear" + "::" + no + "::" + year;;
-                    redisTemplate.opsForValue().set(yearListPrefix, Result.success(page), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+                    try {
+                        redisTemplate.opsForValue().set(yearListPrefix, objectMapper.writeValueAsString(Result.success(page)), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+                    } catch (JsonProcessingException e) {
+                        log.info(e.getMessage());
+                    }
                     //bloom过滤器
                     redisTemplate.opsForValue().setBit(Const.BLOOM_FILTER_YEAR_PAGE + year, no, true);
                 }
@@ -114,7 +141,11 @@ public class CacheScheduled {
         //searchYears和getCountByYear
         CompletableFuture<Void> var5 = CompletableFuture.runAsync(() -> {
             String yearKey = Const.YEARS + "::BlogController::searchYears";
-            redisTemplate.opsForValue().set(yearKey, Result.success(years), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+            try {
+                redisTemplate.opsForValue().set(yearKey, objectMapper.writeValueAsString(Result.success(years)), ThreadLocalRandom.current().nextInt(120) + 1, TimeUnit.MINUTES);
+            } catch (JsonProcessingException e) {
+                log.info(e.getMessage());
+            }
             //getCountByYear的bloom
             years.forEach(year -> redisTemplate.opsForValue().setBit(Const.BLOOM_FILTER_YEARS, year, true));
         }, executor);

@@ -4,7 +4,6 @@ import com.chiu.sgsingle.component.*;
 import com.chiu.sgsingle.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,8 +27,6 @@ public class SecurityConfig {
 
     JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
 
-    RedisTemplate<String, Object> redisTemplate;
-
     UserRepository userRepository;
 
     UserDetailsService userDetailsService;
@@ -38,13 +35,12 @@ public class SecurityConfig {
 
     JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(LoginFailureHandler loginFailureHandler, LoginSuccessHandler loginSuccessHandler, CaptchaFilter captchaFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtLogoutSuccessHandler jwtLogoutSuccessHandler, RedisTemplate<String, Object> redisTemplate, UserRepository userRepository, UserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(LoginFailureHandler loginFailureHandler, LoginSuccessHandler loginSuccessHandler, CaptchaFilter captchaFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtLogoutSuccessHandler jwtLogoutSuccessHandler, UserRepository userRepository, UserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.loginFailureHandler = loginFailureHandler;
         this.loginSuccessHandler = loginSuccessHandler;
         this.captchaFilter = captchaFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtLogoutSuccessHandler = jwtLogoutSuccessHandler;
-        this.redisTemplate = redisTemplate;
         this.userRepository = userRepository;
         this.userDetailsService = userDetailsService;
         this.authenticationManager = authenticationManager;
