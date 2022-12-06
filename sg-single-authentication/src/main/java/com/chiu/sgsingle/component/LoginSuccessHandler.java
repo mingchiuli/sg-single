@@ -43,11 +43,11 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		ServletOutputStream outputStream = response.getOutputStream();
 
-		// 生成jwt
-		String jwt = jwtUtils.generateToken(authentication.getName(),
-				authentication.getAuthorities().stream().findFirst().map(GrantedAuthority::getAuthority).orElse("ROLE_default"));
-
 		Optional<Authentication> authOptional = Optional.of(authentication);
+		// 生成jwt
+		String jwt = jwtUtils.generateToken(authOptional.orElseThrow().getName(),
+				authOptional.get().getAuthorities().stream().findFirst().map(GrantedAuthority::getAuthority).orElse("ROLE_default"));
+
 
 		UserEntity user = userService.retrieveUserInfo(authOptional.map(Principal::getName).orElseThrow()).orElseThrow();
 

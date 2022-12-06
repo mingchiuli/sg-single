@@ -48,8 +48,8 @@ public interface BlogRepository extends JpaRepository<BlogEntity, Long> {
     Integer findCount();
 
     @Query(value = "SELECT count(1) from m_blog where created > ?1", nativeQuery = true)
-    long getPageCount(String created);
+    Long getPageCount(String created);
 
     @Query(value = "SELECT count(1) from m_blog where created < ?1 and Year(created) = ?2", nativeQuery = true)
-    long getPageCountYear(String created, int year);
+    Long getPageCountYear(String created, int year);
 }

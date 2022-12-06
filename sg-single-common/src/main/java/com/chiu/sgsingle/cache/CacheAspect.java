@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,7 +61,8 @@ public class CacheAspect {
         StringBuilder params = new StringBuilder();
 
         for (int i = 0; i < args.length; i++) {
-            if (args[i] != null) {
+            Optional<Object> arg = Optional.ofNullable(args[i]);
+            if (arg.isPresent()) {
                 //方法的参数必须是能够json化的
                 params.append("::");
                 if (args[i] instanceof String) {
@@ -69,8 +71,6 @@ public class CacheAspect {
                     params.append(objectMapper.writeValueAsString(args[i]));
                 }
                 parameterTypes[i] = args[i].getClass();
-            } else {
-                parameterTypes[i] = null;
             }
         }
 
@@ -102,14 +102,17 @@ public class CacheAspect {
             return pjp.proceed();
         }
 
-        if (o != null) {
-            return objectMapper.convertValue(o, javaType);
+        Optional<Object> objOptional = Optional.ofNullable(o);
+
+        if (objOptional.isPresent()) {
+            return objectMapper.convertValue(objOptional.get(), javaType);
         }
 
-        String lock = (LOCK + className + methodName + params).intern();
+        String lock = (LOCK + className + methodName + params);
+
 
         //防止缓存击穿
-        synchronized (lock) {
+        synchronized (lock.intern()) {
             //双重检查
             Object r = redisTemplate.opsForValue().get(redisKey);
 

@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 		String username = claim.getSubject();
 		String role = (String) claim.get("authorization");
 		return new PreAuthenticatedAuthenticationToken(username,
-				null,
+				"",
 				AuthorityUtils.createAuthorityList(role));
 	}
 }

@@ -10,7 +10,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 

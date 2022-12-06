@@ -150,11 +150,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<BlogEntity> findAll() {
-        List<BlogEntity> entities = new ArrayList<>();
-        for (BlogEntity blogEntity : blogRepository.findAll()) {
-            entities.add(blogEntity);
-        }
-        return entities;
+        return new ArrayList<>(blogRepository.findAll());
     }
 
     @Override
@@ -166,35 +162,40 @@ public class BlogServiceImpl implements BlogService {
     public void saveOrUpdate(BlogEntityVo blog) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<UserEntity> user = userService.findByUsername(username);
-        BlogEntity blogEntity;
-        BlogIndexEnum type;
-        if (blog.getId() == null) {
-            blogEntity = new BlogEntity();
-            blogEntity.setCreated(LocalDateTime.now());
-            blogEntity.setUserId(user.orElseThrow().getId());
-            blogEntity.setReadCount(0L);
-            type = BlogIndexEnum.CREATE;
-        } else {
+        var ref = new Object() {
+            BlogEntity blogEntity;
+            BlogIndexEnum type;
+        };
+
+        Optional.ofNullable(blog.getId()).ifPresentOrElse((id) -> {
+            ref.blogEntity = new BlogEntity();
+            ref.blogEntity.setCreated(LocalDateTime.now());
+            ref.blogEntity.setUserId(id);
+            ref.blogEntity.setReadCount(0L);
+            ref.type = BlogIndexEnum.CREATE;
+        }, () -> {
             Optional<BlogEntity> optionalBlog = blogRepository.findById(blog.getId());
-            blogEntity = optionalBlog.orElseThrow();
-            Assert.isTrue(blogEntity.getUserId().equals(user.orElseThrow().getId()), "只能编辑自己的文章!");
-            type = BlogIndexEnum.UPDATE;
-        }
-        BeanUtils.copyProperties(blog, blogEntity);
-        blogEntity = blogRepository.save(blogEntity);
+            ref.blogEntity = optionalBlog.orElseThrow();
+            Assert.isTrue(ref.blogEntity.getUserId().equals(user.orElseThrow().getId()), "只能编辑自己的文章!");
+            ref.type = BlogIndexEnum.UPDATE;
+        });
+
+
+        BeanUtils.copyProperties(blog, ref.blogEntity);
+        blogRepository.save(ref.blogEntity);
 
         //通知消息给mq,更新并删除缓存
         CorrelationData correlationData = new CorrelationData();
         //防止重复消费
         redisTemplate.opsForValue().set(Const.CONSUME_MONITOR + correlationData.getId(),
-                        type.name() + "_" + blogEntity.getId(),
+                        ref.type.name() + "_" + ref.blogEntity.getId(),
                         30,
                         TimeUnit.SECONDS);
 
         rabbitTemplate.convertAndSend(
                 RabbitConfig.ES_EXCHANGE,
                 RabbitConfig.ES_BINDING_KEY,
-                new BlogSearchIndexMessage(blogEntity.getId(), type, blogEntity.getCreated().getYear()),
+                new BlogSearchIndexMessage(ref.blogEntity.getId(), ref.type, ref.blogEntity.getCreated().getYear()),
                 correlationData);
     }
 
@@ -235,10 +236,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public String getBlogToken() {
         String token = (String) redisTemplate.opsForValue().get(Const.READ_TOKEN);
-        if (token == null) {
-            token = "阅读密钥目前没有设置";
-        }
-        return token;
+        return Optional.ofNullable(token).orElse("阅读密钥目前没有设置");
     }
 
     @Override
