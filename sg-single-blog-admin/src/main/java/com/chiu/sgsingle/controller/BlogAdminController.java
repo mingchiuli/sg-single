@@ -28,21 +28,21 @@ public class BlogAdminController {
 
     @PreAuthorize("hasAnyRole(@highestRoleHolder.getRole(), @defaultRoleHolder.getRole())")
     @PostMapping("/edit")
-    public Result<Object> saveOrUpdate(@RequestBody @Validated BlogEntityVo blog) {
+    public Result<Void> saveOrUpdate(@RequestBody @Validated BlogEntityVo blog) {
         blogService.saveOrUpdate(blog);
         return Result.success();
     }
 
     @PreAuthorize("hasAnyRole(@highestRoleHolder.getRole())")
     @PostMapping("/delete")
-    public Result<Object> deleteBlogs(@RequestBody List<Long> ids) {
+    public Result<Void> deleteBlogs(@RequestBody List<Long> ids) {
         blogService.deleteBlogs(ids);
         return Result.success();
     }
 
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
     @GetMapping("/set/token")
-    public Result<Object> setBlogToken() {
+    public Result<Void> setBlogToken() {
         blogService.setBlogToken();
         return Result.success();
     }

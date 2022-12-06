@@ -17,7 +17,7 @@ public interface MenuService {
 
     List<MenuEntityVo> tree();
 
-    void save(MenuEntityVo menu);
+    void saveOrUpdate(MenuEntityVo menu);
 
     void delete(Long id);
 }

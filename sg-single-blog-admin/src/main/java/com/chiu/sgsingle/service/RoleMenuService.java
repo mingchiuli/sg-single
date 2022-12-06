@@ -1,5 +1,8 @@
 package com.chiu.sgsingle.service;
 
+
+import com.chiu.sgsingle.entity.RoleMenuEntity;
+
 import java.util.List;
 
 /**
@@ -8,5 +11,10 @@ import java.util.List;
  */
 public interface RoleMenuService {
 
-    List<Long> getNavMenuIds(String role);
+    void deleteByRoleId(Long roleId);
+
+    List<Long> findMenuIdsByRoleId(Long id);
+
+    void saveAll(List<RoleMenuEntity> roleMenus);
+
 }

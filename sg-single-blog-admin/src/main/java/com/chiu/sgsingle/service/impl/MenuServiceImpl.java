@@ -4,7 +4,7 @@ import com.chiu.sgsingle.entity.MenuEntity;
 import com.chiu.sgsingle.entity.UserEntity;
 import com.chiu.sgsingle.repository.MenuRepository;
 import com.chiu.sgsingle.service.MenuService;
-import com.chiu.sgsingle.service.RoleMenuService;
+import com.chiu.sgsingle.service.RoleService;
 import com.chiu.sgsingle.service.UserService;
 import com.chiu.sgsingle.vo.MenuEntityVo;
 import org.springframework.beans.BeanUtils;
@@ -22,13 +22,13 @@ public class MenuServiceImpl implements MenuService {
 
     UserService userService;
 
-    RoleMenuService roleMenuService;
+    RoleService roleService;
 
     MenuRepository menuRepository;
 
-    public MenuServiceImpl(UserService userService, RoleMenuService roleMenuService, MenuRepository menuRepository) {
+    public MenuServiceImpl(UserService userService, RoleService roleService, MenuRepository menuRepository) {
         this.userService = userService;
-        this.roleMenuService = roleMenuService;
+        this.roleService = roleService;
         this.menuRepository = menuRepository;
     }
 
@@ -38,7 +38,7 @@ public class MenuServiceImpl implements MenuService {
         Optional<UserEntity> userEntity = userService.retrieveUserInfo(username);
         String role = userEntity.orElseThrow().getRole();
 
-        List<Long> menuIds = roleMenuService.getNavMenuIds(role);
+        List<Long> menuIds = roleService.getNavMenuIds(role);
         Iterable<MenuEntity> menus = menuRepository.findAllById(menuIds);
         ArrayList<MenuEntityVo> entities = new ArrayList<>();
         menus.forEach(menu -> {
@@ -69,7 +69,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public void save(MenuEntityVo menu) {
+    public void saveOrUpdate(MenuEntityVo menu) {
         MenuEntity menuEntity = new MenuEntity();
         BeanUtils.copyProperties(menu, menuEntity);
         menuRepository.save(menuEntity);

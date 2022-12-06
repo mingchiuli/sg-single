@@ -174,16 +174,15 @@ public class BlogServiceImpl implements BlogService {
         };
 
         Optional.ofNullable(blog.getId()).ifPresentOrElse((id) -> {
-            ref.blogEntity = new BlogEntity();
-            ref.blogEntity.setCreated(LocalDateTime.now());
-            ref.blogEntity.setUserId(id);
-            ref.blogEntity.setReadCount(0L);
-            ref.type = BlogIndexEnum.CREATE;
-        }, () -> {
-            Optional<BlogEntity> optionalBlog = blogRepository.findById(blog.getId());
-            ref.blogEntity = optionalBlog.orElseThrow();
+            ref.blogEntity = blogRepository.findById(blog.getId()).orElseThrow();
             Assert.isTrue(ref.blogEntity.getUserId().equals(user.orElseThrow().getId()), "只能编辑自己的文章!");
             ref.type = BlogIndexEnum.UPDATE;
+        }, () -> {
+            ref.blogEntity = new BlogEntity();
+            ref.blogEntity.setCreated(LocalDateTime.now());
+            ref.blogEntity.setUserId(user.orElseThrow().getId());
+            ref.blogEntity.setReadCount(0L);
+            ref.type = BlogIndexEnum.CREATE;
         });
 
 

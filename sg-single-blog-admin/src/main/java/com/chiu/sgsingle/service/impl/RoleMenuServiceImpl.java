@@ -1,9 +1,8 @@
 package com.chiu.sgsingle.service.impl;
 
-import com.chiu.sgsingle.entity.RoleEntity;
+import com.chiu.sgsingle.entity.RoleMenuEntity;
 import com.chiu.sgsingle.repository.RoleMenuRepository;
 import com.chiu.sgsingle.service.RoleMenuService;
-import com.chiu.sgsingle.service.RoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,19 +14,24 @@ import java.util.List;
 @Service
 public class RoleMenuServiceImpl implements RoleMenuService {
 
-    RoleService roleService;
-
     RoleMenuRepository roleMenuRepository;
 
-    public RoleMenuServiceImpl(RoleService roleService, RoleMenuRepository roleMenuRepository) {
-        this.roleService = roleService;
+    public RoleMenuServiceImpl(RoleMenuRepository roleMenuRepository) {
         this.roleMenuRepository = roleMenuRepository;
     }
 
     @Override
-    public List<Long> getNavMenuIds(String role) {
-        RoleEntity roleEntity = roleService.findByCode(role);
-        Long id = roleEntity.getId();
+    public void deleteByRoleId(Long roleId) {
+        roleMenuRepository.deleteByRoleId(roleId);
+    }
+
+    @Override
+    public List<Long> findMenuIdsByRoleId(Long id) {
         return roleMenuRepository.findMenuIdsByRoleId(id);
+    }
+
+    @Override
+    public void saveAll(List<RoleMenuEntity> roleMenus) {
+        roleMenuRepository.saveAll(roleMenus);
     }
 }

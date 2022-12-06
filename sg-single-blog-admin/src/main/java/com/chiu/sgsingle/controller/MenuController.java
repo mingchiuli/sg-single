@@ -57,14 +57,14 @@ public class MenuController {
 
     @PostMapping("/save")
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
-    public Result<Object> saveOrUpdate(@Validated @RequestBody MenuEntityVo menu) {
-        menuService.save(menu);
+    public Result<Void> saveOrUpdate(@Validated @RequestBody MenuEntityVo menu) {
+        menuService.saveOrUpdate(menu);
         return Result.success();
     }
 
     @PostMapping("/delete/{id}")
     @PreAuthorize("hasRole(@highestRoleHolder.getRole())")
-    public Result<Object> delete(@PathVariable("id") Long id) {
+    public Result<Void> delete(@PathVariable("id") Long id) {
         menuService.delete(id);
         return Result.success();
     }

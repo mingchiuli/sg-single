@@ -15,4 +15,6 @@ import java.util.List;
 public interface RoleMenuRepository extends JpaRepository<RoleMenuEntity, Long> {
     @Query(value = "SELECT menu_id from m_role_menu where role_id = ?1", nativeQuery = true)
     List<Long> findMenuIdsByRoleId(Long id);
+
+    void deleteByRoleId(Long roleId);
 }
