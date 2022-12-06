@@ -65,12 +65,12 @@ public class CacheAspect {
             if (arg.isPresent()) {
                 //方法的参数必须是能够json化的
                 params.append("::");
-                if (args[i] instanceof String) {
-                    params.append(args[i]);
+                if (arg.get() instanceof String) {
+                    params.append(arg.get());
                 } else {
-                    params.append(objectMapper.writeValueAsString(args[i]));
+                    params.append(objectMapper.writeValueAsString(arg.get()));
                 }
-                parameterTypes[i] = args[i].getClass();
+                parameterTypes[i] = arg.get().getClass();
             }
         }
 
